@@ -6,6 +6,8 @@ import (
 	"time"
 	"io/ioutil"
 	"io"
+	"github.com/jtacoma/uritemplates"
+	"log"
 )
 
 var defaultClient = &http.Client{
@@ -13,14 +15,14 @@ var defaultClient = &http.Client{
 }
 
 type Cast struct {
-	client *http.Client
-	api string
-	method string
-	header http.Header
+	client     *http.Client
+	api        string
+	method     string
+	header     http.Header
 	queryParam url.Values
-	pathParam url.Values
-	body ReqBody
-	basicAuth *BasicAuth
+	pathParam  map[string]interface{}
+	body       ReqBody
+	basicAuth  *BasicAuth
 }
 
 func New(sl ...Setter) *Cast {
@@ -40,8 +42,8 @@ func (c *Cast) WithApi(api string) *Cast {
 }
 
 func (c *Cast) WithMethod(method string) *Cast {
-		c.method = method
-		return c
+	c.method = method
+	return c
 }
 
 func (c *Cast) WithHeader(header http.Header) *Cast {
@@ -49,12 +51,12 @@ func (c *Cast) WithHeader(header http.Header) *Cast {
 	return c
 }
 
-func (c * Cast) WithQueryParam(queryParam url.Values) *Cast {
+func (c *Cast) WithQueryParam(queryParam url.Values) *Cast {
 	c.queryParam = queryParam
 	return c
 }
 
-func (c * Cast) WithPathParam(pathParam url.Values) *Cast {
+func (c *Cast) WithPathParam(pathParam map[string]interface{}) *Cast {
 	c.pathParam = pathParam
 	return c
 }
@@ -65,6 +67,18 @@ func (c *Cast) WithBody(body ReqBody) *Cast {
 }
 
 func (c *Cast) Request() (*Reply, error) {
+	if len(c.pathParam) > 0 {
+		tpl, err := uritemplates.Parse(c.api)
+		if err != nil {
+			return nil, err
+		}
+		c.api, err = tpl.Expand(c.pathParam)
+		log.Println(c.api)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var (
 		reqBody io.Reader
 		err error
@@ -81,7 +95,7 @@ func (c *Cast) Request() (*Reply, error) {
 	}
 
 	for k, vv := range c.header {
-		for _, v := range(vv) {
+		for _, v := range (vv) {
 			req.Header.Add(k, v)
 		}
 	}
@@ -91,7 +105,7 @@ func (c *Cast) Request() (*Reply, error) {
 		return nil, err
 	}
 	for k, vv := range c.queryParam {
-		for _, v := range(vv) {
+		for _, v := range (vv) {
 			values.Add(k, v)
 		}
 	}
@@ -114,14 +128,7 @@ func (c *Cast) Request() (*Reply, error) {
 		return nil, err
 	}
 	rep.body = repBody
-	c.Reset()
 	return rep, nil
 }
 
-func (c *Cast) Reset() {
-	copy := New()
-	copy.client = c.client
-	copy.basicAuth = c.basicAuth
-	c = copy
-	return
-}
+
