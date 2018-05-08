@@ -1,6 +1,9 @@
 package cast
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 type Reply struct {
 	statusCode int
@@ -13,4 +16,8 @@ func (rep *Reply) DecodeFromJson(v interface{}) error {
 
 func (rep *Reply) Body() []byte {
 	return rep.body
+}
+
+func (rep *Reply) StatusOk() bool {
+	return rep.statusCode == http.StatusOK
 }
