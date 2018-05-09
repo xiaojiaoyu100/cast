@@ -10,20 +10,20 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-type ReqBody interface {
+type reqBody interface {
 	ContentType() string
 	Body() (io.Reader, error)
 }
 
-type ReqJsonBody struct {
+type reqJsonBody struct {
 	payload interface{}
 }
 
-func (body ReqJsonBody) ContentType() string {
+func (body reqJsonBody) ContentType() string {
 	return applicaionJson
 }
 
-func (body ReqJsonBody) Body() (io.Reader, error) {
+func (body reqJsonBody) Body() (io.Reader, error) {
 	var buffer bytes.Buffer
 	if err := json.NewEncoder(&buffer).Encode(body.payload); err != nil {
 		return nil, err
@@ -31,15 +31,15 @@ func (body ReqJsonBody) Body() (io.Reader, error) {
 	return &buffer, nil
 }
 
-type ReqFormUrlEncodedBody struct {
+type reqFormUrlEncodedBody struct {
 	payload interface{}
 }
 
-func (body ReqFormUrlEncodedBody) ContentType() string {
+func (body reqFormUrlEncodedBody) ContentType() string {
 	return formUrlEncoded
 }
 
-func (body ReqFormUrlEncodedBody) Body() (io.Reader, error) {
+func (body reqFormUrlEncodedBody) Body() (io.Reader, error) {
 	values, err := query.Values(body.payload)
 	if err != nil {
 		return nil, err

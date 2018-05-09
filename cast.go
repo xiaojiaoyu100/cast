@@ -28,7 +28,7 @@ type Cast struct {
 	header     http.Header
 	queryParam interface{}
 	pathParam  map[string]interface{}
-	body       ReqBody
+	body       reqBody
 	basicAuth  *BasicAuth
 	retry      int
 	strat      backoffStrategy
@@ -92,14 +92,14 @@ func (c *Cast) WithPathParam(pathParam map[string]interface{}) *Cast {
 }
 
 func (c *Cast) WithJsonBody(body interface{}) *Cast {
-	c.body = ReqJsonBody{
+	c.body = reqJsonBody{
 		payload: body,
 	}
 	return c
 }
 
 func (c *Cast) WithUrlEncodedFormBody(body interface{}) *Cast {
-	c.body = ReqFormUrlEncodedBody{
+	c.body = reqFormUrlEncodedBody{
 		payload: body,
 	}
 	return c
