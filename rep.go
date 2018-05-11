@@ -21,3 +21,7 @@ func (rep *Reply) Body() []byte {
 func (rep *Reply) StatusOk() bool {
 	return rep.statusCode == http.StatusOK
 }
+
+func (rep *Reply) StatusCode() int {
+	return rep.statusCode
+}
