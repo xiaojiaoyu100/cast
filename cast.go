@@ -284,8 +284,10 @@ func (c *Cast) Request() (*Reply, error) {
 			if resp != nil {
 				resp.Body.Close()
 			}
-			<-time.After(c.strat.backoff(count))
-			continue
+			if c.strat != nil {
+				<-time.After(c.strat.backoff(count))
+				continue
+			}
 		}
 
 		break
