@@ -17,7 +17,7 @@ import (
 )
 
 var defaultClient = &http.Client{
-	Timeout: 5 * time.Second,
+	Timeout: 10 * time.Second,
 }
 
 type Cast struct {
