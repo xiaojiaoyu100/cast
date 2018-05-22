@@ -178,6 +178,8 @@ func (c *Cast) WithTimeout(timeout time.Duration) *Cast {
 }
 
 func (c *Cast) Request() (*Reply, error) {
+	start := time.Now()
+
 	if len(c.pathParam) > 0 {
 		tpl, err := uritemplates.Parse(c.api)
 		if err != nil {
@@ -201,14 +203,10 @@ func (c *Cast) Request() (*Reply, error) {
 			c.logger.Printf("ERROR [%v]", err)
 			return nil, err
 		}
-		switch c.body.ContentType() {
-		case applicaionJson:
+
+		if len(c.body.ContentType()) > 0 {
 			c.SetHeader(http.Header{
-				contentType: []string{applicaionJson},
-			})
-		case formUrlEncoded:
-			c.SetHeader(http.Header{
-				contentType: []string{formUrlEncoded},
+				contentType: []string{c.body.ContentType()},
 			})
 		}
 	}
@@ -243,7 +241,7 @@ func (c *Cast) Request() (*Reply, error) {
 	req.URL.RawQuery = values.Encode()
 
 	if c.basicAuth != nil {
-		req.SetBasicAuth(c.basicAuth.Info())
+		req.SetBasicAuth(c.basicAuth.info())
 	}
 
 	if c.dumpRequestHook != nil {
@@ -310,6 +308,9 @@ func (c *Cast) Request() (*Reply, error) {
 		return nil, err
 	}
 	rep.body = repBody
+	rep.cost = time.Since(start)
+
+	c.logger.Printf("%s took: %s", req.URL.String(), rep.cost)
 
 	return rep, nil
 }

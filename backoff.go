@@ -32,9 +32,10 @@ type exponentialBackoff struct {
 }
 
 func (backoff exponentialBackoff) expo(retry int) float64 {
+	c := float64(backoff.cap)
 	b := float64(backoff.base)
 	r := float64(retry)
-	return math.Min(b, math.Exp2(r)*b)
+	return math.Min(c, math.Exp2(r)*b)
 }
 
 type exponentialBackoffStrategy struct {
@@ -51,7 +52,8 @@ type exponentialBackoffEqualJitterStrategy struct {
 
 func (strat exponentialBackoffEqualJitterStrategy) backoff(retry int) time.Duration {
 	v := strat.expo(retry)
-	return time.Duration(v/2.0 + rand.Float64()*v/2.0)
+	u := uniform(0, v/2.0)
+	return time.Duration(v/2.0 + u)
 }
 
 type exponentialBackoffFullJitterStrategy struct {
@@ -60,7 +62,8 @@ type exponentialBackoffFullJitterStrategy struct {
 
 func (strat exponentialBackoffFullJitterStrategy) backoff(retry int) time.Duration {
 	v := strat.expo(retry)
-	return time.Duration(rand.Float64() * v)
+	u := uniform(0, v)
+	return time.Duration(u)
 }
 
 type exponentialBackoffDecorrelatedJitterStrategy struct {
@@ -68,6 +71,16 @@ type exponentialBackoffDecorrelatedJitterStrategy struct {
 	sleep time.Duration
 }
 
+// uniform returns number in [min, max)
+func uniform(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
 func (strat exponentialBackoffDecorrelatedJitterStrategy) backoff(retry int) time.Duration {
-	return time.Duration(math.Min(float64(strat.cap), float64(strat.base)+rand.Float64()*(float64(strat.sleep)*3-float64(strat.base))))
+	c := float64(strat.cap)
+	b := float64(strat.base)
+	s := float64(strat.sleep)
+	u := uniform(b, 3*s)
+	s = math.Min(c, u)
+	return time.Duration(s)
 }

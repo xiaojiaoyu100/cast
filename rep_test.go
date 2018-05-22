@@ -1,9 +1,10 @@
 package cast
 
 import (
-	"testing"
-	"net/http"
 	"crypto/rand"
+	"net/http"
+	"testing"
+	"time"
 )
 
 func TestReply_DecodeFromJson(t *testing.T) {
@@ -11,7 +12,7 @@ func TestReply_DecodeFromJson(t *testing.T) {
 		body: []byte(`{"code": 0, "msg": "ok"}`),
 	}
 	var temp struct {
-		Code int `json:"code"`
+		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 	}
 	if err := reply.DecodeFromJson(&temp); err != nil {
@@ -29,7 +30,7 @@ func TestReply_Body(t *testing.T) {
 		t.Fatal(err)
 	}
 	reply := Reply{
-		body:        body,
+		body: body,
 	}
 	if string(reply.Body()) != string(body) {
 		t.Fatal("Body() unexpected return")
@@ -54,4 +55,12 @@ func TestReply_StatusCode(t *testing.T) {
 	}
 }
 
-
+func TestReply_Cost(t *testing.T) {
+	cost := 100 * time.Millisecond
+	reply := Reply{
+		cost: cost,
+	}
+	if reply.Cost() != cost {
+		t.Fatal("Cost() unexpected return.")
+	}
+}
