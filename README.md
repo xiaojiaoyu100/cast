@@ -1,4 +1,6 @@
-# cast [![Build Status](https://travis-ci.org/xiaojiaoyu100/cast.svg?branch=master)](https://travis-ci.org/xiaojiaoyu100/cast)
+# cast
+
+[![Build Status](https://travis-ci.org/xiaojiaoyu100/cast.svg?branch=master)](https://travis-ci.org/xiaojiaoyu100/cast)
 
 Cast is a http request library written in Golang.
 
