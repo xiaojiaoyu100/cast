@@ -1,5 +1,7 @@
 # cast
 
+[![Build Status](https://travis-ci.org/xiaojiaoyu100/cast.svg?branch=master)](https://travis-ci.org/xiaojiaoyu100/cast)
+
 Cast is a http request library written in Golang.
 
 This project is ready for production use and the master branch is always stable. But the API may be broken in the future release.
@@ -12,7 +14,6 @@ This project is ready for production use and the master branch is always stable.
 + Encode struct into http.Request body, including JSON and x-www-form-urlencoded data.
 + Support retry backoff strategies and provide retry hooks to customize retry conditions with respect to http.Response
 + Support timeout http.Request
-
 
 
 ## Getting started
@@ -50,5 +51,6 @@ if err := reply.DecodeFromJson(&ApiUrl); err != nil {
 ## License
 
 [MIT License](LICENSE)
+
 
 
