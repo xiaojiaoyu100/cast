@@ -265,6 +265,12 @@ func TestCast_WithTimeout(t *testing.T) {
 	assert(t, timeout == cast.timeout, "unexpected timeout")
 }
 
-func TestCast_Request(t *testing.T) {
-
+func TestCast_finalizeApi(t *testing.T) {
+	cast := New()
+	api := "/{project}/{path}/to"
+	pathParam := make(map[string]interface{})
+	pathParam["project"] = "cast"
+	pathParam["path"] = 3
+	cast.WithApi(api).WithPathParam(pathParam).finalizeApi()
+	assert(t, cast.api == "/cast/3/to", "unexpected finalizeApi")
 }

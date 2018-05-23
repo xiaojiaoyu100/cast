@@ -211,7 +211,7 @@ func (c *Cast) reqBody() (io.Reader, error) {
 }
 
 func (c *Cast) finalizeHeader(request *http.Request) {
-	if len(c.body.ContentType()) > 0 {
+	if c.body != nil && len(c.body.ContentType()) > 0 {
 		c.SetHeader(http.Header{
 			contentType: []string{c.body.ContentType()},
 		})
@@ -224,7 +224,7 @@ func (c *Cast) finalizeHeader(request *http.Request) {
 	}
 }
 
-func (c *Cast) genQueryParamIfAny(request *http.Request) error {
+func (c *Cast) finalizeQueryParamIfAny(request *http.Request) error {
 	values, err := url.ParseQuery(request.URL.RawQuery)
 	if err != nil {
 		c.logger.Printf("ERROR [%v]", err)
@@ -312,6 +312,7 @@ func (c *Cast) genReply(start time.Time, request *http.Request) (*Reply, error) 
 	}
 
 	if err != nil {
+		c.logger.Printf("ERROR [%v]", err)
 		return nil, err
 	}
 
@@ -334,7 +335,7 @@ func (c *Cast) genReply(start time.Time, request *http.Request) (*Reply, error) 
 	rep.cost = time.Since(start)
 	rep.times = count
 
-	c.logger.Printf("%s took: %s upto %d time(s)", resp.Request.URL.String(), rep.cost)
+	c.logger.Printf("%s took %s upto %d time(s)", resp.Request.URL.String(), rep.cost, rep.times)
 
 	return rep, nil
 }
@@ -361,7 +362,7 @@ func (c *Cast) Request() (*Reply, error) {
 
 	c.finalizeHeader(req)
 
-	if err := c.genQueryParamIfAny(req); err != nil {
+	if err := c.finalizeQueryParamIfAny(req); err != nil {
 		c.logger.Printf("ERROR [%v]", err)
 		return nil, err
 	}
