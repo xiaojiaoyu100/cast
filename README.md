@@ -44,7 +44,7 @@ if !reply.StatusOk() {
     return
 }
 if err := reply.DecodeFromJson(&ApiUrl); err != nil {
-    log.Fatalln(err)git st
+    log.Fatalln(err)
 ```
 
 ## License
