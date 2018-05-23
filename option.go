@@ -39,9 +39,15 @@ func WithRetryHook(hooks ...RetryHook) Setter {
 	}
 }
 
-func WithLogger(log *log.Logger) Setter {
+func WithRetry(retry int) Setter {
 	return func(c *Cast) {
-		c.logger = log
+		c.retry = retry
+	}
+}
+
+func WithLogger(logger *log.Logger) Setter {
+	return func(c *Cast) {
+		c.logger = logger
 	}
 }
 

@@ -3,11 +3,14 @@ package cast
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type Reply struct {
 	statusCode int
 	body       []byte
+	cost       time.Duration
+	times int
 }
 
 func (rep *Reply) DecodeFromJson(v interface{}) error {
@@ -24,4 +27,8 @@ func (rep *Reply) StatusOk() bool {
 
 func (rep *Reply) StatusCode() int {
 	return rep.statusCode
+}
+
+func (rep *Reply) Cost() time.Duration {
+	return rep.cost
 }
