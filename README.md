@@ -9,9 +9,9 @@ This project is ready for production use and the master branch is always stable.
 + Use functional options to provide clean constructor.
 + Support url path params. 
 + Encode struct into url query params.
-* Encode struct into http.Request body, including JSON and x-www-form-urlencoded data.
-* Support retry backoff strategies and provide retry hooks to customize retry conditions with respect to http.Response
-* Support timeout http.Request
++ Encode struct into http.Request body, including JSON and x-www-form-urlencoded data.
++ Support retry backoff strategies and provide retry hooks to customize retry conditions with respect to http.Response
++ Support timeout http.Request
 
 
 
