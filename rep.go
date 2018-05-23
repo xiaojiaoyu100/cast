@@ -10,6 +10,7 @@ type Reply struct {
 	statusCode int
 	body       []byte
 	cost       time.Duration
+	times int
 }
 
 func (rep *Reply) DecodeFromJson(v interface{}) error {

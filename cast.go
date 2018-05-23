@@ -177,22 +177,23 @@ func (c *Cast) WithTimeout(timeout time.Duration) *Cast {
 	return c
 }
 
-func (c *Cast) Request() (*Reply, error) {
-	start := time.Now()
-
+func (c *Cast) finalizeApi() error {
 	if len(c.pathParam) > 0 {
 		tpl, err := uritemplates.Parse(c.api)
 		if err != nil {
 			c.logger.Printf("ERROR [%v]", err)
-			return nil, err
+			return err
 		}
 		c.api, err = tpl.Expand(c.pathParam)
 		if err != nil {
 			c.logger.Printf("ERROR [%v]", err)
-			return nil, err
+			return err
 		}
 	}
+	return nil
+}
 
+func (c *Cast) reqBody() (io.Reader, error) {
 	var (
 		reqBody io.Reader
 		err     error
@@ -204,61 +205,80 @@ func (c *Cast) Request() (*Reply, error) {
 			return nil, err
 		}
 
-		if len(c.body.ContentType()) > 0 {
-			c.SetHeader(http.Header{
-				contentType: []string{c.body.ContentType()},
-			})
-		}
 	}
-	req, err := http.NewRequest(c.method, c.urlPrefix+c.api, reqBody)
-	if err != nil {
-		c.logger.Printf("ERROR [%v]", err)
-		return nil, err
+
+	return reqBody, nil
+}
+
+func (c *Cast) finalizeHeader(request *http.Request) {
+	if len(c.body.ContentType()) > 0 {
+		c.SetHeader(http.Header{
+			contentType: []string{c.body.ContentType()},
+		})
 	}
 
 	for k, vv := range c.header {
 		for _, v := range vv {
-			req.Header.Add(k, v)
+			request.Header.Add(k, v)
 		}
 	}
+}
 
-	values, err := url.ParseQuery(req.URL.RawQuery)
+func (c *Cast) genQueryParamIfAny(request *http.Request) error {
+	values, err := url.ParseQuery(request.URL.RawQuery)
 	if err != nil {
 		c.logger.Printf("ERROR [%v]", err)
-		return nil, err
+		return err
 	}
 
 	qValues, err := query.Values(c.queryParam)
 	if err != nil {
 		c.logger.Printf("ERROR [%v]", err)
-		return nil, err
+		return err
 	}
 	for k, vv := range qValues {
 		for _, v := range vv {
 			values.Add(k, v)
 		}
 	}
-	req.URL.RawQuery = values.Encode()
+	request.URL.RawQuery = values.Encode()
 
+	return nil
+}
+
+func (c *Cast) setBasicAuthIfAny(request *http.Request) {
 	if c.basicAuth != nil {
-		req.SetBasicAuth(c.basicAuth.info())
+		request.SetBasicAuth(c.basicAuth.info())
 	}
+}
 
-	if c.dumpRequestHook != nil {
-		c.dumpRequestHook(c.logger, req)
-	}
-
+func (c *Cast) setTimeoutIfAny(request *http.Request) {
 	if c.timeout > 0 {
 		ctx, cancel := context.WithCancel(context.TODO())
 		_ = time.AfterFunc(c.timeout, func() {
 			cancel()
 		})
-		req = req.WithContext(ctx)
+		request = request.WithContext(ctx)
 	}
+}
 
+func (c *Cast) dumpRequestHookIfAny(request *http.Request) {
+	if c.dumpRequestHook != nil {
+		c.dumpRequestHook(c.logger, request)
+	}
+}
+
+func (c *Cast) dumpResponseHookIfAny(response *http.Response) {
+	if c.dumpResponseHook != nil {
+		c.dumpResponseHook(c.logger, response)
+	}
+}
+
+func (c *Cast) genReply(start time.Time, request *http.Request) (*Reply, error) {
 	var (
 		resp  *http.Response
 		count = 0
+		err   error
 	)
 
 	for {
@@ -267,7 +287,7 @@ func (c *Cast) Request() (*Reply, error) {
 			break
 		}
 
-		resp, err = c.client.Do(req)
+		resp, err = c.client.Do(request)
 		count++
 
 		var isRetry bool
@@ -295,10 +315,13 @@ func (c *Cast) Request() (*Reply, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	if c.dumpResponseHook != nil {
-		c.dumpResponseHook(c.logger, resp)
+	if err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
 	}
+	defer resp.Body.Close()
+
+	c.dumpResponseHookIfAny(resp)
 
 	rep := new(Reply)
 	rep.statusCode = resp.StatusCode
@@ -309,8 +332,49 @@ func (c *Cast) Request() (*Reply, error) {
 	}
 	rep.body = repBody
 	rep.cost = time.Since(start)
+	rep.times = count
 
-	c.logger.Printf("%s took: %s", req.URL.String(), rep.cost)
+	c.logger.Printf("%s took: %s upto %d time(s)", resp.Request.URL.String(), rep.cost)
+
+	return rep, nil
+}
+
+func (c *Cast) Request() (*Reply, error) {
+	start := time.Now()
+
+	if err := c.finalizeApi(); err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
+	}
+
+	reqBody, err := c.reqBody()
+	if err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
+	}
+
+	req, err := http.NewRequest(c.method, c.urlPrefix+c.api, reqBody)
+	if err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
+	}
+
+	c.finalizeHeader(req)
+
+	if err := c.genQueryParamIfAny(req); err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
+	}
+
+	c.setBasicAuthIfAny(req)
+	c.setTimeoutIfAny(req)
+	c.dumpRequestHookIfAny(req)
+
+	rep, err := c.genReply(start, req)
+	if err != nil {
+		c.logger.Printf("ERROR [%v]", err)
+		return nil, err
+	}
 
 	return rep, nil
 }

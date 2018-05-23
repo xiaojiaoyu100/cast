@@ -5,12 +5,38 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/google/go-querystring/query"
 )
+
+func assert(tb testing.TB, condition bool, msg string, v ...interface{}) {
+	if !condition {
+		_, file, line, _ := runtime.Caller(1)
+		fmt.Printf("\033[31m%s:%d: "+msg+"\033[39m\n\n", append([]interface{}{filepath.Base(file), line}, v...)...)
+		tb.FailNow()
+	}
+}
+
+func ok(tb testing.TB, err error) {
+	if err != nil {
+		_, file, line, _ := runtime.Caller(1)
+		fmt.Printf("\033[31m%s:%d: unexpected error: %s\033[39m\n\n", filepath.Base(file), line, err.Error())
+		tb.FailNow()
+	}
+}
+
+func equals(tb testing.TB, exp, act interface{}) {
+	if !reflect.DeepEqual(exp, act) {
+		_, file, line, _ := runtime.Caller(1)
+		fmt.Printf("\033[31m%s:%d:\n\n\texp: %#v\n\n\tgot: %#v\033[39m\n\n", filepath.Base(file), line, exp, act)
+		tb.FailNow()
+	}
+}
 
 func TestCast_WithApi(t *testing.T) {
 	cast := New()
@@ -25,9 +51,8 @@ func TestCast_WithMethod(t *testing.T) {
 	cast := New()
 	method := http.MethodPut
 	cast.WithMethod(method)
-	if method != cast.method {
-		t.Fatal("unexpected method")
-	}
+
+	assert(t, method == cast.method, "unexpected method")
 }
 
 func TestCast_AppendHeader(t *testing.T) {
@@ -71,6 +96,7 @@ func TestCast_WithQueryParam(t *testing.T) {
 		Code string `url:"code"`
 	}
 	cast.WithQueryParam(query)
+
 	if !reflect.DeepEqual(query, cast.queryParam) {
 		t.Fatal("unexpected queryParam")
 	}
@@ -99,19 +125,14 @@ func TestCast_WithJsonBody(t *testing.T) {
 	cast.WithJsonBody(p)
 
 	body, err := cast.body.Body()
-	if err != nil {
-		t.Fatal(err)
-	}
+	ok(t, err)
 
 	bytes, err := ioutil.ReadAll(body)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ok(t, err)
 
 	var b payload
-	if err := json.Unmarshal(bytes, &b); err != nil {
-		t.Fatal(err)
-	}
+	err = json.Unmarshal(bytes, &b)
+	ok(t, err)
 
 	if p.Code != b.Code || p.Msg != b.Msg {
 		t.Fatal("unexpected body")
@@ -239,10 +260,9 @@ func TestCast_AddRetryHooks(t *testing.T) {
 
 func TestCast_WithTimeout(t *testing.T) {
 	cast := New()
-	cast.WithTimeout(3 * time.Second)
-	if 3*time.Second != cast.timeout {
-		t.Fatal("unexpected timeout")
-	}
+	timeout := 3 * time.Second
+	cast.WithTimeout(timeout)
+	assert(t, timeout == cast.timeout, "unexpected timeout")
 }
 
 func TestCast_Request(t *testing.T) {
