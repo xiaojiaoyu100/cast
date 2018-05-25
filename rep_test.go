@@ -2,6 +2,7 @@ package cast
 
 import (
 	"crypto/rand"
+	"encoding/xml"
 	"net/http"
 	"testing"
 	"time"
@@ -21,6 +22,31 @@ func TestReply_DecodeFromJson(t *testing.T) {
 	if temp.Code != 0 && temp.Msg != "ok" {
 		t.Fatal("fail to decode json stream.")
 	}
+}
+
+func TestReply_DecodeFromXml(t *testing.T) {
+	reply := new(Reply)
+	reply.body = []byte(
+		`<person id="13"><name><first>John</first><last>Doe</last></name><age>42</age><Married>false</Married><City>Hanga Roa</City><State>Easter Island</State><!-- Need more details. --></person>`,
+	)
+	type Address struct {
+		City, State string
+	}
+	type Person struct {
+		XMLName   xml.Name `xml:"person"`
+		Id        int      `xml:"id,attr"`
+		FirstName string   `xml:"name>first"`
+		LastName  string   `xml:"name>last"`
+		Age       int      `xml:"age"`
+		Height    float32  `xml:"height,omitempty"`
+		Married   bool
+		Address
+		Comment string `xml:",comment"`
+	}
+	p := Person{}
+	err := reply.DecodeFromXml(&p)
+	ok(t, err)
+	assert(t, p.Id == 13, "unexpected DecodeFromXml")
 }
 
 func TestReply_Body(t *testing.T) {

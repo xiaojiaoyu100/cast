@@ -98,6 +98,20 @@ func (c *Cast) WithJsonBody(body interface{}) *Cast {
 	return c
 }
 
+func (c *Cast) WithXmlBody(body interface{}) *Cast {
+	c.body = reqXmlBody{
+		payload: body,
+	}
+	return c
+}
+
+func (c *Cast) WithPlainBody(body string) *Cast {
+	c.body = reqPlainBody{
+		payload: body,
+	}
+	return c
+}
+
 func (c *Cast) WithUrlEncodedFormBody(body interface{}) *Cast {
 	c.body = reqFormUrlEncodedBody{
 		payload: body,
