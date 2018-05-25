@@ -2,6 +2,7 @@ package cast
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"net/http"
 	"time"
 )
@@ -15,6 +16,10 @@ type Reply struct {
 
 func (rep *Reply) DecodeFromJson(v interface{}) error {
 	return json.Unmarshal(rep.body, &v)
+}
+
+func (rep *Reply) DecodeFromXml(v interface{}) error {
+	return xml.Unmarshal(rep.body, &v)
 }
 
 func (rep *Reply) Body() []byte {

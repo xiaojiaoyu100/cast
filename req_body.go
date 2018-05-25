@@ -7,6 +7,8 @@ import (
 
 	"strings"
 
+	"encoding/xml"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -45,4 +47,32 @@ func (body reqFormUrlEncodedBody) Body() (io.Reader, error) {
 		return nil, err
 	}
 	return strings.NewReader(values.Encode()), nil
+}
+
+type reqXmlBody struct {
+	payload interface{}
+}
+
+func (body reqXmlBody) Body() (io.Reader, error) {
+	var buffer bytes.Buffer
+	if err := xml.NewEncoder(&buffer).Encode(body.payload); err != nil {
+		return nil, err
+	}
+	return &buffer, nil
+}
+
+func (body reqXmlBody) ContentType() string {
+	return applicationXml
+}
+
+type reqPlainBody struct {
+	payload string
+}
+
+func (body reqPlainBody) ContentType() string {
+	return textPlain
+}
+
+func (body reqPlainBody) Body() (io.Reader, error) {
+	return strings.NewReader(body.payload), nil
 }
