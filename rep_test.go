@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/xml"
 	"net/http"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -61,6 +62,24 @@ func TestReply_Body(t *testing.T) {
 	if string(reply.Body()) != string(body) {
 		t.Fatal("Body() unexpected return")
 	}
+}
+
+func TestReply_Size(t *testing.T) {
+	rep := new(Reply)
+	rep.size = 100
+
+	assert(t, rep.Size() == 100, "unexpected Size()")
+}
+
+func TestReply_Header(t *testing.T) {
+	header := http.Header{
+		"Content-Type": []string{"application/json; charset=utf-8"},
+	}
+
+	rep := new(Reply)
+	rep.header = header
+
+	assert(t, reflect.DeepEqual(rep.Header(), header), "unexpected Header()")
 }
 
 func TestReply_StatusOk(t *testing.T) {

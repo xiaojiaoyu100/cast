@@ -266,14 +266,15 @@ func (c *Cast) setBasicAuthIfAny(request *http.Request) {
 	}
 }
 
-func (c *Cast) setTimeoutIfAny(request *http.Request) {
+func (c *Cast) setTimeoutIfAny(request *http.Request) *http.Request {
 	if c.timeout > 0 {
 		ctx, cancel := context.WithCancel(context.TODO())
 		_ = time.AfterFunc(c.timeout, func() {
 			cancel()
 		})
-		request = request.WithContext(ctx)
+		return request.WithContext(ctx)
 	}
+	return request
 }
 
 func (c *Cast) dumpRequestHookIfAny(request *http.Request) {
@@ -287,7 +288,6 @@ func (c *Cast) dumpResponseHookIfAny(response *http.Response) {
 		c.dumpResponseHook(c.logger, response)
 	}
 }
-
 
 func (c *Cast) genReply(start time.Time, request *http.Request) (*Reply, error) {
 	var (
@@ -347,6 +347,9 @@ func (c *Cast) genReply(start time.Time, request *http.Request) (*Reply, error) 
 		return nil, err
 	}
 	rep.body = repBody
+	rep.size = resp.ContentLength
+	rep.header = resp.Header
+	rep.cookies = resp.Cookies()
 	rep.cost = time.Since(start)
 	rep.times = count
 
@@ -383,7 +386,7 @@ func (c *Cast) Request() (*Reply, error) {
 	}
 
 	c.setBasicAuthIfAny(req)
-	c.setTimeoutIfAny(req)
+	req = c.setTimeoutIfAny(req)
 	c.dumpRequestHookIfAny(req)
 
 	rep, err := c.genReply(start, req)
