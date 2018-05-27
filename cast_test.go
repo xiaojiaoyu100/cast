@@ -17,7 +17,7 @@ import (
 func assert(tb testing.TB, condition bool, msg string, v ...interface{}) {
 	if !condition {
 		_, file, line, _ := runtime.Caller(1)
-		fmt.Printf("\033[31m%s:%d: "+msg+"\033[39m\n\n", append([]interface{}{filepath.Base(file), line}, v...)...)
+		fmt.Printf("\033[31m%s:%d: " + msg + "\033[39m\n\n", append([]interface{}{filepath.Base(file), line}, v...)...)
 		tb.FailNow()
 	}
 }
@@ -38,21 +38,67 @@ func equals(tb testing.TB, exp, act interface{}) {
 	}
 }
 
-func TestCast_WithApi(t *testing.T) {
+func TestCast_WithPath(t *testing.T) {
 	cast := New()
-	api := "/check"
-	cast.WithApi(api)
-	if api != cast.api {
-		t.Fatal("unexpected api")
+	path := "/check"
+	cast.WithPath(path)
+	if path != cast.path {
+		t.Fatal("unexpected path")
 	}
 }
 
-func TestCast_WithMethod(t *testing.T) {
-	cast := New()
-	method := http.MethodPut
-	cast.WithMethod(method)
+func TestCast_Options(t *testing.T) {
+	c := new(Cast)
+	c.Options()
+	assert(t, c.method == "OPTIONS", "Options() unexpected")
+}
 
-	assert(t, method == cast.method, "unexpected method")
+func TestCast_Get(t *testing.T) {
+	c := new(Cast)
+	c.Get()
+	assert(t, c.method == "GET", "Get() unexpected")
+}
+
+func TestCast_Head(t *testing.T) {
+	c := new(Cast)
+	c.Head()
+	assert(t, c.method == "HEAD", "Head() unexpected")
+}
+
+func TestCast_Post(t *testing.T) {
+	c := new(Cast)
+	c.Post()
+	assert(t, c.method == "POST", "Post() unexpected")
+}
+
+func TestCast_Put(t *testing.T) {
+	c := new(Cast)
+	c.Put()
+	assert(t, c.method == "PUT", "Put() unexpected")
+}
+
+func TestCast_Delete(t *testing.T) {
+	c := new(Cast)
+	c.Delete()
+	assert(t, c.method == "DELETE", "Delete() unexpected")
+}
+
+func TestCast_Trace(t *testing.T) {
+	c := new(Cast)
+	c.Trace()
+	assert(t, c.method == "TRACE", "Trace() unexpected")
+}
+
+func TestCast_Connect(t *testing.T) {
+	c := new(Cast)
+	c.Connect()
+	assert(t, c.method == "CONNECT", "Connect() unexpected")
+}
+
+func TestCast_Patch(t *testing.T) {
+	c := new(Cast)
+	c.Patch()
+	assert(t, c.method == "PATCH", "Patch() unexpected")
 }
 
 func TestCast_AppendHeader(t *testing.T) {
@@ -208,7 +254,7 @@ func ExampleCast_WithConstantBackoffStrategy() {
 
 func ExampleCast_WithExponentialBackoffStrategy() {
 	cast := New()
-	cast.WithExponentialBackoffStrategy(time.Second, 10*time.Second)
+	cast.WithExponentialBackoffStrategy(time.Second, 10 * time.Second)
 	for i := 1; i <= 5; i++ {
 		fmt.Println(cast.strat.backoff(i))
 	}
@@ -222,7 +268,7 @@ func ExampleCast_WithExponentialBackoffStrategy() {
 
 func BenchmarkCast_WithExponentialBackoffEqualJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffEqualJitterStrategy(time.Second, 10*time.Second)
+	cast.WithExponentialBackoffEqualJitterStrategy(time.Second, 10 * time.Second)
 	for i := 0; i <= b.N; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -230,7 +276,7 @@ func BenchmarkCast_WithExponentialBackoffEqualJitterStrategy(b *testing.B) {
 
 func BenchmarkCast_WithExponentialBackoffFullJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffFullJitterStrategy(time.Second, 10*time.Second)
+	cast.WithExponentialBackoffFullJitterStrategy(time.Second, 10 * time.Second)
 	for i := 1; i <= 5; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -238,7 +284,7 @@ func BenchmarkCast_WithExponentialBackoffFullJitterStrategy(b *testing.B) {
 
 func BenchmarkCast_WithExponentialBackoffDecorrelatedJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffDecorrelatedJitterStrategy(time.Second, 10*time.Second)
+	cast.WithExponentialBackoffDecorrelatedJitterStrategy(time.Second, 10 * time.Second)
 	for i := 1; i <= 5; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -265,12 +311,4 @@ func TestCast_WithTimeout(t *testing.T) {
 	assert(t, timeout == cast.timeout, "unexpected timeout")
 }
 
-func TestCast_finalizeApi(t *testing.T) {
-	cast := New()
-	api := "/{project}/{path}/to"
-	pathParam := make(map[string]interface{})
-	pathParam["project"] = "cast"
-	pathParam["path"] = 3
-	cast.WithApi(api).WithPathParam(pathParam).finalizeApi()
-	assert(t, cast.api == "/cast/3/to", "unexpected finalizeApi")
-}
+

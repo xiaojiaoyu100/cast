@@ -26,12 +26,12 @@ This project is ready for production use and the master branch is always stable.
 ### Get
 
 ```go
-urlPrefix := "https://status.github.com"
+baseUrl := "https://status.github.com"
 // Get
 c := cast.New(
-    cast.WithUrlPrefix(urlPrefix),
+    cast.WithBaseUrl(baseUrl),
 )
-reply, err := c.WithApi("/api.json").Request()
+reply, err := c.Get().WithPath("/api.json").WithTimeout(10 * time.Millisecond).Request()
 if err != nil {
     log.Fatalln(err)
 }
@@ -41,12 +41,13 @@ var ApiUrl struct {
     LastMessageUrl string `json:"last_message_url"`
     DailySummary   string `json:"daily_summary"`
 }
-log.Println(string(reply.Body()))
+log.Println(string(reply.Body()), reply.Url())
 if !reply.StatusOk() {
     return
 }
 if err := reply.DecodeFromJson(&ApiUrl); err != nil {
     log.Fatalln(err)
+}
 ```
 
 ## License

@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+func TestReply_Url(t *testing.T) {
+	reply := new(Reply)
+	reply.url = "https://google.com"
+	assert(t, reply.Url() == "https://google.com", "unexpected Url()")
+}
+
 func TestReply_DecodeFromJson(t *testing.T) {
 	reply := Reply{
 		body: []byte(`{"code": 0, "msg": "ok"}`),
@@ -42,7 +48,7 @@ func TestReply_DecodeFromXml(t *testing.T) {
 		Height    float32  `xml:"height,omitempty"`
 		Married   bool
 		Address
-		Comment string `xml:",comment"`
+		Comment   string `xml:",comment"`
 	}
 	p := Person{}
 	err := reply.DecodeFromXml(&p)
@@ -98,6 +104,20 @@ func TestReply_StatusCode(t *testing.T) {
 	if reply.StatusCode() != http.StatusBadRequest {
 		t.Fatal("StatusCode() unexpected return.")
 	}
+}
+
+func TestReply_Start(t *testing.T) {
+	start := time.Now().In(time.UTC)
+	reply := new(Reply)
+	reply.start = start
+	assert(t, reply.Start() == start, "unexpected Start()")
+}
+
+func TestReply_End(t *testing.T) {
+	end := time.Now().In(time.UTC)
+	reply := new(Reply)
+	reply.end = end
+	assert(t, reply.End() == end, "unexpected End()")
 }
 
 func TestReply_Cost(t *testing.T) {

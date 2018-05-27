@@ -21,9 +21,15 @@ func WithBasicAuth(username, password string) Setter {
 	}
 }
 
-func WithUrlPrefix(u string) Setter {
+func WithBearerToken(token string) Setter {
 	return func(c *Cast) {
-		c.urlPrefix = u
+		c.bearerToken = token
+	}
+}
+
+func WithBaseUrl(u string) Setter {
+	return func(c *Cast) {
+		c.baseUrl = u
 	}
 }
 
@@ -48,17 +54,5 @@ func WithRetry(retry int) Setter {
 func WithLogger(logger *log.Logger) Setter {
 	return func(c *Cast) {
 		c.logger = logger
-	}
-}
-
-func WithDumpRequestHook() Setter {
-	return func(c *Cast) {
-		c.dumpRequestHook = dumpRequest
-	}
-}
-
-func WithDumpResponseHook() Setter {
-	return func(c *Cast) {
-		c.dumpResponseHook = dumpResponse
 	}
 }

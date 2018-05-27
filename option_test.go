@@ -39,11 +39,17 @@ func TestWithBasicAuth(t *testing.T) {
 	}
 }
 
-func TestWithUrlPrefix(t *testing.T) {
-	urlPrefix := "https://www.xiaozhibo.com"
-	cast := New(WithUrlPrefix(urlPrefix))
-	if cast.urlPrefix != urlPrefix {
-		t.Fatal("fail to initialize urlPrefix.")
+func TestWithBearerToken(t *testing.T) {
+	token := "djsfdeferfrefjnrjfn"
+	cast := New(WithBearerToken(token))
+	assert(t, cast.bearerToken == token, "unexpected token")
+}
+
+func TestWithBaseUrl(t *testing.T) {
+	u := "https://www.xiaozhibo.com"
+	cast := New(WithBaseUrl(u))
+	if cast.baseUrl != u {
+		t.Fatal("fail to initialize baseUrl.")
 	}
 }
 
@@ -84,19 +90,5 @@ func TestWithLogger(t *testing.T) {
 	cast := New(WithLogger(logger))
 	if cast.logger != logger {
 		t.Fatal("fail to initialize logger.")
-	}
-}
-
-func TestWithDumpRequestHook(t *testing.T) {
-	cast := New(WithDumpRequestHook())
-	if cast.dumpRequestHook == nil {
-		t.Fatal("fail to initialize dumpRequestHook.")
-	}
-}
-
-func TestWithDumpResponseHook(t *testing.T) {
-	cast := New(WithDumpResponseHook())
-	if cast.dumpResponseHook == nil {
-		t.Fatal("fail to initialize dumpResponseHook.")
 	}
 }

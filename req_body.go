@@ -1,12 +1,8 @@
 package cast
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
-
-	"strings"
-
 	"encoding/xml"
 
 	"github.com/google/go-querystring/query"
@@ -26,11 +22,11 @@ func (body reqJsonBody) ContentType() string {
 }
 
 func (body reqJsonBody) Body() (io.Reader, error) {
-	var buffer bytes.Buffer
-	if err := json.NewEncoder(&buffer).Encode(body.payload); err != nil {
+	buffer := getBuffer()
+	if err := json.NewEncoder(buffer).Encode(body.payload); err != nil {
 		return nil, err
 	}
-	return &buffer, nil
+	return buffer, nil
 }
 
 type reqFormUrlEncodedBody struct {
@@ -46,7 +42,9 @@ func (body reqFormUrlEncodedBody) Body() (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	return strings.NewReader(values.Encode()), nil
+	buffer := getBuffer()
+	buffer.WriteString(values.Encode())
+	return buffer, nil
 }
 
 type reqXmlBody struct {
@@ -54,11 +52,11 @@ type reqXmlBody struct {
 }
 
 func (body reqXmlBody) Body() (io.Reader, error) {
-	var buffer bytes.Buffer
-	if err := xml.NewEncoder(&buffer).Encode(body.payload); err != nil {
+	buffer := getBuffer()
+	if err := xml.NewEncoder(buffer).Encode(body.payload); err != nil {
 		return nil, err
 	}
-	return &buffer, nil
+	return buffer, nil
 }
 
 func (body reqXmlBody) ContentType() string {
@@ -74,5 +72,11 @@ func (body reqPlainBody) ContentType() string {
 }
 
 func (body reqPlainBody) Body() (io.Reader, error) {
-	return strings.NewReader(body.payload), nil
+	buffer := getBuffer()
+	buffer.WriteString(body.payload)
+	return buffer, nil
 }
+
+
+
+

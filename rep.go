@@ -8,13 +8,20 @@ import (
 )
 
 type Reply struct {
+	url        string
 	statusCode int
 	body       []byte
 	size       int64
 	header     http.Header
 	cookies    []*http.Cookie
+	start      time.Time
+	end        time.Time
 	cost       time.Duration
 	times      int
+}
+
+func (rep *Reply) Url() string {
+	return rep.url
 }
 
 func (rep *Reply) DecodeFromJson(v interface{}) error {
@@ -47,6 +54,14 @@ func (rep *Reply) StatusOk() bool {
 
 func (rep *Reply) StatusCode() int {
 	return rep.statusCode
+}
+
+func (rep *Reply) Start() time.Time {
+	return rep.start
+}
+
+func (rep *Reply) End() time.Time {
+	return rep.end
 }
 
 func (rep *Reply) Cost() time.Duration {
