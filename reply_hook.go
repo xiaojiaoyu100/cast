@@ -8,11 +8,10 @@ func dumpReply(cast *Cast, reply *Reply) error {
 	}
 
 	if cast.logger == nil {
-		return  nil
+		return nil
 	}
 
 	cast.logger.Printf("%s took %s upto %d time(s)", reply.Url(), reply.cost, reply.times)
 
 	return nil
 }
-

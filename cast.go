@@ -41,7 +41,7 @@ func New(sl ...Setter) *Cast {
 	c.client = defaultClient
 	c.header = make(http.Header)
 	c.pathParam = make(map[string]interface{})
-	c.logger = log.New(os.Stderr, "[CAST]", log.LstdFlags | log.Llongfile)
+	c.logger = log.New(os.Stderr, "[CAST]", log.LstdFlags|log.Llongfile)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
 	c.afterRequestHooks = defaultAfterRequestHooks
 
@@ -255,7 +255,7 @@ func (c *Cast) WithTimeout(timeout time.Duration) *Cast {
 func (c *Cast) reqBody() (io.Reader, error) {
 	var (
 		reqBody io.Reader
-		err error
+		err     error
 	)
 	if c.body != nil {
 		reqBody, err = c.body.Body()
@@ -273,7 +273,7 @@ func (c *Cast) genReply(request *http.Request) (*Reply, error) {
 	var (
 		resp  *http.Response
 		count = 0
-		err error
+		err   error
 	)
 
 	for {
@@ -293,7 +293,7 @@ func (c *Cast) genReply(request *http.Request) (*Reply, error) {
 			}
 		}
 
-		if (isRetry && count <= c.retry + 1) || err != nil {
+		if (isRetry && count <= c.retry+1) || err != nil {
 			if resp != nil {
 				resp.Body.Close()
 			}
@@ -351,13 +351,13 @@ func (c *Cast) Request() (*Reply, error) {
 		return nil, err
 	}
 
-	for _, hook := range (c.beforeRequestHooks) {
+	for _, hook := range c.beforeRequestHooks {
 		if err := hook(c); err != nil {
 			return nil, err
 		}
 	}
 
-	req, err := http.NewRequest(c.method, c.baseUrl + c.path, reqBody)
+	req, err := http.NewRequest(c.method, c.baseUrl+c.path, reqBody)
 	if err != nil {
 		c.logger.Printf("ERROR [%v]", err)
 		return nil, err

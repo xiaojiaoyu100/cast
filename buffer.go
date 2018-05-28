@@ -1,9 +1,9 @@
 package cast
 
 import (
-	"sync"
 	"bytes"
 	"io"
+	"sync"
 )
 
 var bufferPool = &sync.Pool{
@@ -29,7 +29,3 @@ func putBuffer(reader io.Reader) {
 	buffer.Reset()
 	bufferPool.Put(buffer)
 }
-
-
-
-

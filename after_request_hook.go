@@ -1,12 +1,13 @@
 package cast
 
 import (
-	"net/http"
-	"github.com/google/go-querystring/query"
-	"net/url"
+	"context"
 	"fmt"
-	"golang.org/x/net/context"
+	"net/http"
+	"net/url"
 	"time"
+
+	"github.com/google/go-querystring/query"
 )
 
 type AfterRequestHook func(cast *Cast, request *http.Request) (*http.Request, error)
@@ -79,8 +80,3 @@ func setTimeoutIfAny(cast *Cast, request *http.Request) (*http.Request, error) {
 	}
 	return request, nil
 }
-
-
-
-
-

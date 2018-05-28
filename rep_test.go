@@ -48,7 +48,7 @@ func TestReply_DecodeFromXml(t *testing.T) {
 		Height    float32  `xml:"height,omitempty"`
 		Married   bool
 		Address
-		Comment   string `xml:",comment"`
+		Comment string `xml:",comment"`
 	}
 	p := Person{}
 	err := reply.DecodeFromXml(&p)

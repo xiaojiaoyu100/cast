@@ -2,6 +2,7 @@ package cast
 
 import (
 	"time"
+
 	"github.com/jtacoma/uritemplates"
 )
 
@@ -34,10 +35,3 @@ func finalizePathIfAny(cast *Cast) error {
 	}
 	return nil
 }
-
-
-
-
-
-
-

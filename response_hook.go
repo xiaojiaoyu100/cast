@@ -5,6 +5,3 @@ import (
 )
 
 type ResponseHook func(cast *Cast, response *http.Response) error
-
-
-

@@ -2,8 +2,8 @@ package cast
 
 import (
 	"encoding/json"
-	"io"
 	"encoding/xml"
+	"io"
 
 	"github.com/google/go-querystring/query"
 )
@@ -76,7 +76,3 @@ func (body reqPlainBody) Body() (io.Reader, error) {
 	buffer.WriteString(body.payload)
 	return buffer, nil
 }
-
-
-
-

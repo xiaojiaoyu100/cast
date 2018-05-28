@@ -17,7 +17,7 @@ import (
 func assert(tb testing.TB, condition bool, msg string, v ...interface{}) {
 	if !condition {
 		_, file, line, _ := runtime.Caller(1)
-		fmt.Printf("\033[31m%s:%d: " + msg + "\033[39m\n\n", append([]interface{}{filepath.Base(file), line}, v...)...)
+		fmt.Printf("\033[31m%s:%d: "+msg+"\033[39m\n\n", append([]interface{}{filepath.Base(file), line}, v...)...)
 		tb.FailNow()
 	}
 }
@@ -254,7 +254,7 @@ func ExampleCast_WithConstantBackoffStrategy() {
 
 func ExampleCast_WithExponentialBackoffStrategy() {
 	cast := New()
-	cast.WithExponentialBackoffStrategy(time.Second, 10 * time.Second)
+	cast.WithExponentialBackoffStrategy(time.Second, 10*time.Second)
 	for i := 1; i <= 5; i++ {
 		fmt.Println(cast.strat.backoff(i))
 	}
@@ -268,7 +268,7 @@ func ExampleCast_WithExponentialBackoffStrategy() {
 
 func BenchmarkCast_WithExponentialBackoffEqualJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffEqualJitterStrategy(time.Second, 10 * time.Second)
+	cast.WithExponentialBackoffEqualJitterStrategy(time.Second, 10*time.Second)
 	for i := 0; i <= b.N; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -276,7 +276,7 @@ func BenchmarkCast_WithExponentialBackoffEqualJitterStrategy(b *testing.B) {
 
 func BenchmarkCast_WithExponentialBackoffFullJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffFullJitterStrategy(time.Second, 10 * time.Second)
+	cast.WithExponentialBackoffFullJitterStrategy(time.Second, 10*time.Second)
 	for i := 1; i <= 5; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -284,7 +284,7 @@ func BenchmarkCast_WithExponentialBackoffFullJitterStrategy(b *testing.B) {
 
 func BenchmarkCast_WithExponentialBackoffDecorrelatedJitterStrategy(b *testing.B) {
 	cast := New()
-	cast.WithExponentialBackoffDecorrelatedJitterStrategy(time.Second, 10 * time.Second)
+	cast.WithExponentialBackoffDecorrelatedJitterStrategy(time.Second, 10*time.Second)
 	for i := 1; i <= 5; i++ {
 		b.Log(cast.strat.backoff(i))
 	}
@@ -310,5 +310,3 @@ func TestCast_WithTimeout(t *testing.T) {
 	cast.WithTimeout(timeout)
 	assert(t, timeout == cast.timeout, "unexpected timeout")
 }
-
-
