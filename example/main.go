@@ -8,7 +8,6 @@ import (
 
 func main() {
 	cast.QuickDebug()
-
 	baseUrl := "https://status.github.com"
 	// Get
 	c := cast.New(cast.WithBaseUrl(baseUrl))
