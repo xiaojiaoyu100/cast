@@ -14,16 +14,16 @@ type linearBackoffStrategy struct {
 	slope time.Duration
 }
 
-func (strat linearBackoffStrategy) backoff(retry int) time.Duration {
-	return time.Duration(retry) * strat.slope
+func (stg linearBackoffStrategy) backoff(retry int) time.Duration {
+	return time.Duration(retry) * stg.slope
 }
 
 type constantBackOffStrategy struct {
 	interval time.Duration
 }
 
-func (strat constantBackOffStrategy) backoff(retry int) time.Duration {
-	return strat.interval
+func (stg constantBackOffStrategy) backoff(retry int) time.Duration {
+	return stg.interval
 }
 
 type exponentialBackoff struct {
@@ -42,16 +42,16 @@ type exponentialBackoffStrategy struct {
 	exponentialBackoff
 }
 
-func (strat exponentialBackoffStrategy) backoff(retry int) time.Duration {
-	return time.Duration(strat.expo(retry))
+func (stg exponentialBackoffStrategy) backoff(retry int) time.Duration {
+	return time.Duration(stg.expo(retry))
 }
 
 type exponentialBackoffEqualJitterStrategy struct {
 	exponentialBackoff
 }
 
-func (strat exponentialBackoffEqualJitterStrategy) backoff(retry int) time.Duration {
-	v := strat.expo(retry)
+func (stg exponentialBackoffEqualJitterStrategy) backoff(retry int) time.Duration {
+	v := stg.expo(retry)
 	u := uniform(0, v/2.0)
 	return time.Duration(v/2.0 + u)
 }
@@ -60,8 +60,8 @@ type exponentialBackoffFullJitterStrategy struct {
 	exponentialBackoff
 }
 
-func (strat exponentialBackoffFullJitterStrategy) backoff(retry int) time.Duration {
-	v := strat.expo(retry)
+func (stg exponentialBackoffFullJitterStrategy) backoff(retry int) time.Duration {
+	v := stg.expo(retry)
 	u := uniform(0, v)
 	return time.Duration(u)
 }
@@ -71,15 +71,15 @@ type exponentialBackoffDecorrelatedJitterStrategy struct {
 	sleep time.Duration
 }
 
-// uniform returns number in [min, max)
+// uniform returns a number in [min, max)
 func uniform(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
 }
 
-func (strat exponentialBackoffDecorrelatedJitterStrategy) backoff(retry int) time.Duration {
-	c := float64(strat.cap)
-	b := float64(strat.base)
-	s := float64(strat.sleep)
+func (stg exponentialBackoffDecorrelatedJitterStrategy) backoff(retry int) time.Duration {
+	c := float64(stg.cap)
+	b := float64(stg.base)
+	s := float64(stg.sleep)
 	u := uniform(b, 3*s)
 	s = math.Min(c, u)
 	return time.Duration(s)

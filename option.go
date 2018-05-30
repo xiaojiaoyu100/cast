@@ -1,19 +1,59 @@
 package cast
 
 import (
-	"log"
 	"net/http"
+	"time"
 )
 
-type Setter func(cast *Cast)
+type setter func(cast *Cast)
 
-func WithClient(client *http.Client) Setter {
+// WithClient sets the underlying http client.
+func WithClient(client *http.Client) setter {
 	return func(c *Cast) {
 		c.client = client
 	}
 }
 
-func WithBasicAuth(username, password string) Setter {
+// WithBaseUrl sets the consistent part of your address.
+func WithBaseUrl(url string) setter {
+	return func(c *Cast) {
+		c.baseUrl = url
+	}
+}
+
+// WithHeader replaces the underlying header.
+func WithHeader(h http.Header) setter {
+	return func(c *Cast) {
+		c.header = h
+	}
+}
+
+// SetHeader provides an easy way to set header.
+func SetHeader(v ...string) setter {
+	return func(c *Cast) {
+		if len(v) % 2 != 0 {
+			return
+		}
+		for i := 0; i < len(v); i++ {
+			c.header.Set(v[i], v[i + 1])
+		}
+	}
+}
+
+// SetHeader provides an easy way to add header.
+func AddHeader(v ...string) setter {
+	return func(c *Cast) {
+		if len(v) % 2 != 0 {
+			return
+		}
+		for i := 0; i < len(v); i++ {
+			c.header.Add(v[i], v[i + 1])
+		}
+	}
+}
+
+// WithBasicAuth enables basic auth.
+func WithBasicAuth(username, password string) setter {
 	return func(c *Cast) {
 		c.basicAuth = new(BasicAuth)
 		c.basicAuth.username = username
@@ -21,38 +61,104 @@ func WithBasicAuth(username, password string) Setter {
 	}
 }
 
-func WithBearerToken(token string) Setter {
+// WithCookies replaces the underlying cookies which can be sent to server when initiate a request.
+func WithCookies(cookies ...*http.Cookie) setter {
+	return func(c *Cast) {
+		c.cookies = cookies
+	}
+}
+
+// WithBearerToken enables bearer authentication.
+func WithBearerToken(token string) setter {
 	return func(c *Cast) {
 		c.bearerToken = token
 	}
 }
 
-func WithBaseUrl(u string) Setter {
-	return func(c *Cast) {
-		c.baseUrl = u
-	}
-}
-
-func WithHeader(h http.Header) Setter {
-	return func(c *Cast) {
-		c.header = h
-	}
-}
-
-func WithRetryHook(hooks ...RetryHook) Setter {
-	return func(c *Cast) {
-		c.retryHooks = hooks
-	}
-}
-
-func WithRetry(retry int) Setter {
+// WithRetry sets the number of attempts, not counting the normal one.
+func WithRetry(retry int) setter {
 	return func(c *Cast) {
 		c.retry = retry
 	}
 }
 
-func WithLogger(logger *log.Logger) Setter {
+// WithLinearBackoffStrategy changes the retry strategy called "Linear".
+func WithLinearBackoffStrategy(slope time.Duration) setter {
 	return func(c *Cast) {
-		c.logger = logger
+		c.stg = linearBackoffStrategy{
+			slope: slope,
+		}
+	}
+}
+
+// WithConstantBackoffStrategy changes the retry strategy called "Constant".
+func WithConstantBackoffStrategy(internal time.Duration) setter {
+	return func(c *Cast) {
+		c.stg = constantBackOffStrategy{
+			interval: internal,
+		}
+	}
+}
+
+// WithConstantBackoffStrategy changes the retry strategy called "Exponential".
+func WithExponentialBackoffStrategy(base, cap time.Duration) setter {
+	return func(c *Cast) {
+		c.stg = exponentialBackoffStrategy{
+			exponentialBackoff{
+				base: base,
+				cap:  cap,
+			},
+		}
+	}
+}
+
+// WithExponentialBackoffEqualJitterStrategy changes the retry strategy called "Equal Jitter".
+func WithExponentialBackoffEqualJitterStrategy(base, cap time.Duration) setter {
+	return func(c *Cast) {
+		c.stg = exponentialBackoffEqualJitterStrategy{
+			exponentialBackoff{
+				base: base,
+				cap:  cap,
+			},
+		}
+	}
+}
+
+// WithExponentialBackoffFullJitterStrategy changes the retry strategy called "Full Jitter".
+func WithExponentialBackoffFullJitterStrategy(base, cap time.Duration) setter {
+	return func(c *Cast) {
+		c.stg = exponentialBackoffFullJitterStrategy{
+			exponentialBackoff{
+				base: base,
+				cap:  cap,
+			},
+		}
+	}
+}
+
+// WithExponentialBackoffFullJitterStrategy changes the retry strategy called “Decorrelated Jitter”.
+func WithExponentialBackoffDecorrelatedJitterStrategy(base, cap time.Duration) setter {
+	return func(c *Cast) {
+		c.stg = exponentialBackoffDecorrelatedJitterStrategy{
+			exponentialBackoff{
+				base: base,
+				cap:  cap,
+			},
+			base,
+		}
+	}
+}
+
+// AddRetryHooks adds hooks that can be triggered when in customized conditions
+func AddRetryHooks(hooks ...RetryHook) setter {
+	return func(c *Cast) {
+		c.retryHooks = append(c.retryHooks, hooks...)
+	}
+}
+
+// WithDumpBodyLimit sets the maximum dump body limit in bytes.
+func WithDumpBodyLimit(limit int64) setter {
+	return func(c *Cast) {
+		c.dumpBodyLimit = limit
 	}
 }

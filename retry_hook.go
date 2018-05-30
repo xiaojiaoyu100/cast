@@ -1,22 +1,21 @@
 package cast
 
-import (
-	"errors"
-	"net/http"
-)
+import "net/http"
 
-type RetryHook func(resp *http.Response) error
+type RetryHook func(resp *http.Response) bool
 
-func RetryWhenTooManyRequests(resp *http.Response) error {
+// RetryWhenTooManyRequests returns true when http status code is 429, otherwise false.
+func RetryWhenTooManyRequests(resp *http.Response) bool {
 	if resp.StatusCode == http.StatusTooManyRequests {
-		return errors.New(tooManyRequests.String())
+		return true
 	}
-	return nil
+	return false
 }
 
-func RetryWhenInternalServerError(resp *http.Response) error {
+// RetryWhenInternalServerError returns true when http status code is 500, otherwise false.
+func RetryWhenInternalServerError(resp *http.Response) bool {
 	if resp.StatusCode == http.StatusInternalServerError {
-		return errors.New(internalServerError.String())
+		return true
 	}
-	return nil
+	return false
 }

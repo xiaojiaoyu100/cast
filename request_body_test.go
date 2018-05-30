@@ -1,19 +1,17 @@
 package cast
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"io/ioutil"
 	"testing"
-
-	"encoding/xml"
-
-	"bytes"
 
 	"github.com/google/go-querystring/query"
 )
 
 func TestReqJsonBody_ContentType(t *testing.T) {
-	reqJsonBody := reqJsonBody{}
+	reqJsonBody := requestJsonBody{}
 	assert(t, reqJsonBody.ContentType() == "application/json; charset=utf-8", "unexpected json ContentType()")
 }
 
@@ -26,7 +24,7 @@ func TestReqJsonBody_Body(t *testing.T) {
 	var p payload
 	p.Code = 0
 	p.Msg = "ok"
-	reqJsonBody := reqJsonBody{
+	reqJsonBody := requestJsonBody{
 		payload: p,
 	}
 
@@ -51,7 +49,7 @@ func TestReqJsonBody_Body(t *testing.T) {
 }
 
 func TestReqFormUrlEncodedBody_ContentType(t *testing.T) {
-	formBody := reqFormUrlEncodedBody{}
+	formBody := requestFormUrlEncodedBody{}
 	assert(t, formBody.ContentType() == "application/x-www-from-urlencoded", "unexpected form urlencoded ContentType()")
 }
 
@@ -65,7 +63,7 @@ func TestReqFormUrlEncodedBody_Body(t *testing.T) {
 	p.Code = 0
 	p.Msg = "ok"
 
-	req := reqFormUrlEncodedBody{
+	req := requestFormUrlEncodedBody{
 		payload: p,
 	}
 
@@ -108,7 +106,7 @@ func TestReqXmlBody_Body(t *testing.T) {
 	v.Comment = " Need more details. "
 	v.Address = Address{"Hanga Roa", "Easter Island"}
 
-	xmlBody := reqXmlBody{
+	xmlBody := requestXmlBody{
 		payload: v,
 	}
 
@@ -131,12 +129,12 @@ func TestReqXmlBody_Body(t *testing.T) {
 }
 
 func TestReqXmlBody_ContentType(t *testing.T) {
-	reqXmlBody := reqXmlBody{}
+	reqXmlBody := requestXmlBody{}
 	assert(t, reqXmlBody.ContentType() == "application/xml; charset=utf-8", "unexpected xml ContentType()")
 }
 
 func TestReqPlainBody_Body(t *testing.T) {
-	plainBody := reqPlainBody{
+	plainBody := requestPlainBody{
 		payload: "xssfddfdfdfdfdsfds",
 	}
 
@@ -150,6 +148,6 @@ func TestReqPlainBody_Body(t *testing.T) {
 }
 
 func TestReqPlainBody_ContentType(t *testing.T) {
-	plainBody := reqPlainBody{}
+	plainBody := requestPlainBody{}
 	assert(t, plainBody.ContentType() == "text/plain; charset=utf-8", "unexpected xml ContentType()")
 }

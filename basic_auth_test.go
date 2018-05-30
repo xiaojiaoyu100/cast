@@ -11,16 +11,12 @@ func TestBasicAuth_Info(t *testing.T) {
 	p := make([]byte, 10)
 
 	_, err := rand.Read(u)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ok(t, err)
 
 	username := base64.StdEncoding.EncodeToString(u)
 
 	_, err = rand.Read(p)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ok(t, err)
 
 	password := base64.StdEncoding.EncodeToString(p)
 
@@ -30,7 +26,5 @@ func TestBasicAuth_Info(t *testing.T) {
 
 	a, b := basicAuth.info()
 
-	if a != username || b != password {
-		t.Fatal("unexpected return")
-	}
+	assert(t, a == username && b == password, "unexpected return")
 }

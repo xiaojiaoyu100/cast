@@ -2,10 +2,8 @@ package cast
 
 import (
 	"crypto/rand"
-	"log"
 	rand2 "math/rand"
 	"net/http"
-	"os"
 	"testing"
 )
 
@@ -64,31 +62,10 @@ func TestWithHeader(t *testing.T) {
 	}
 }
 
-func TestWithRetryHook(t *testing.T) {
-	internalServerErrorHook := func(resp *http.Response) error {
-		return nil
-	}
-	tooManyRequestsHook := func(resp *http.Response) error {
-		return nil
-	}
-	cast := New(WithRetryHook(internalServerErrorHook, tooManyRequestsHook))
-	if len(cast.retryHooks) != 2 {
-		t.Fatal("fail to initialize retryHooks.")
-	}
-}
-
 func TestWithRetry(t *testing.T) {
 	retry := rand2.Intn(10) + 1
 	cast := New(WithRetry(retry))
 	if cast.retry != retry {
 		t.Fatal("fail to initialize retry.")
-	}
-}
-
-func TestWithLogger(t *testing.T) {
-	logger := log.New(os.Stderr, "", log.Llongfile)
-	cast := New(WithLogger(logger))
-	if cast.logger != logger {
-		t.Fatal("fail to initialize logger.")
 	}
 }

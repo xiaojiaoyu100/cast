@@ -4,16 +4,17 @@ import (
 	"log"
 
 	"github.com/xiaojiaoyu100/cast"
-	"time"
 )
 
 func main() {
+	cast.QuickDebug()
+
 	baseUrl := "https://status.github.com"
 	// Get
-	c := cast.New(
-		cast.WithBaseUrl(baseUrl),
-	)
-	reply, err := c.Get().WithPath("/api.json").WithTimeout(10 * time.Millisecond).Request()
+	c := cast.New(cast.WithBaseUrl(baseUrl))
+	request := c.NewRequest().Get().WithPath("/api.json")
+	resp, err := c.Do(request)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -23,11 +24,11 @@ func main() {
 		LastMessageUrl string `json:"last_message_url"`
 		DailySummary   string `json:"daily_summary"`
 	}
-	log.Println(string(reply.Body()), reply.Url())
-	if !reply.StatusOk() {
+	log.Println(string(resp.Body()))
+	if !resp.StatusOk() {
 		return
 	}
-	if err := reply.DecodeFromJson(&ApiUrl); err != nil {
+	if err := resp.DecodeFromJson(&ApiUrl); err != nil {
 		log.Fatalln(err)
 	}
 }

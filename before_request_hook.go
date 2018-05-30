@@ -1,37 +1,35 @@
 package cast
 
 import (
-	"time"
-
 	"github.com/jtacoma/uritemplates"
 )
 
-type BeforeRequestHook func(cast *Cast) error
+type beforeRequestHook func(cast *Cast, request *Request) error
 
-var defaultBeforeRequestHooks = []BeforeRequestHook{
-	requestStart,
+var defaultBeforeRequestHooks = []beforeRequestHook{
 	finalizePathIfAny,
+	setRequestHeader,
 }
 
-func requestStart(cast *Cast) error {
-	if cast != nil {
-		cast.start = time.Now().In(time.UTC)
+func finalizePathIfAny(cast *Cast, request *Request) error {
+	if len(request.pathParam) > 0 {
+		tpl, err := uritemplates.Parse(request.path)
+		if err != nil {
+			globalLogger.printf("ERROR [%v]", err)
+			return err
+		}
+		request.path, err = tpl.Expand(request.pathParam)
+		if err != nil {
+			globalLogger.printf("ERROR [%v]", err)
+			return err
+		}
 	}
 	return nil
 }
 
-func finalizePathIfAny(cast *Cast) error {
-	if len(cast.pathParam) > 0 {
-		tpl, err := uritemplates.Parse(cast.path)
-		if err != nil {
-			cast.logger.Printf("ERROR [%v]", err)
-			return err
-		}
-		cast.path, err = tpl.Expand(cast.pathParam)
-		if err != nil {
-			cast.logger.Printf("ERROR [%v]", err)
-			return err
-		}
+func setRequestHeader(cast *Cast, request *Request) error {
+	if request.body != nil && len(request.body.ContentType()) > 0 {
+		request.SetHeader(contentType, request.body.ContentType())
 	}
 	return nil
 }

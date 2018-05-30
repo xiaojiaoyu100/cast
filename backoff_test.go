@@ -72,7 +72,7 @@ func BenchmarkExampleExponentialBackoffEqualJitter(b *testing.B) {
 		},
 	}
 	for i := 1; i <= 5; i++ {
-		fmt.Println(s.backoff(i))
+		b.Log(s.backoff(i))
 	}
 }
 
