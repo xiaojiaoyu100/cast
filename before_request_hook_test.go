@@ -1,6 +1,9 @@
 package cast
 
-import "testing"
+import (
+	"encoding/xml"
+	"testing"
+)
 
 func Test_finalizePathIfAny(t *testing.T) {
 	tests := [...]struct {
@@ -36,4 +39,51 @@ func Test_finalizePathIfAny(t *testing.T) {
 
 		assert(t, request.path == tt.want, "%d: finalizePathIfAny error", i)
 	}
+}
+
+func Test_setRequestHeader(t *testing.T) {
+
+	c := New()
+
+	jsonBody := struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}{
+		0,
+		"OK",
+	}
+
+	plainBody := ""
+
+	xmlBody := struct {
+		XMLName xml.Name `xml:"person"`
+		Age     int      `xml:"age,attr"`
+	}{
+		Age: 13,
+	}
+
+	tests := [...]struct {
+		request *Request
+		want    string
+	}{
+		0: {
+			request: c.NewRequest().WithJsonBody(&jsonBody).Post(),
+			want:    "application/json; charset=utf-8",
+		},
+		1: {
+			request: c.NewRequest().WithPlainBody(plainBody).Post(),
+			want:    "text/plain; charset=utf-8",
+		},
+		2: {
+			request: c.NewRequest().WithXmlBody(xmlBody).Post(),
+			want:    "application/xml; charset=utf-8",
+		},
+	}
+
+	for i, tt := range tests {
+		err := setRequestHeader(c, tt.request)
+		ok(t, err)
+		assert(t, tt.request.header.Get("Content-Type") == tt.want, "%d: unexpected setRequestHeader, got: %s ", i, tt.request.header.Get("Content-Type"))
+	}
+
 }

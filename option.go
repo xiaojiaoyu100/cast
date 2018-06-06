@@ -7,13 +7,6 @@ import (
 
 type setter func(cast *Cast)
 
-// WithClient sets the underlying http client.
-func WithClient(client *http.Client) setter {
-	return func(c *Cast) {
-		c.client = client
-	}
-}
-
 // WithBaseUrl sets the consistent part of your address.
 func WithBaseUrl(url string) setter {
 	return func(c *Cast) {
@@ -31,11 +24,11 @@ func WithHeader(h http.Header) setter {
 // SetHeader provides an easy way to set header.
 func SetHeader(v ...string) setter {
 	return func(c *Cast) {
-		if len(v) % 2 != 0 {
+		if len(v)%2 != 0 {
 			return
 		}
 		for i := 0; i < len(v); i++ {
-			c.header.Set(v[i], v[i + 1])
+			c.header.Set(v[i], v[i+1])
 		}
 	}
 }
@@ -43,11 +36,11 @@ func SetHeader(v ...string) setter {
 // SetHeader provides an easy way to add header.
 func AddHeader(v ...string) setter {
 	return func(c *Cast) {
-		if len(v) % 2 != 0 {
+		if len(v)%2 != 0 {
 			return
 		}
 		for i := 0; i < len(v); i++ {
-			c.header.Add(v[i], v[i + 1])
+			c.header.Add(v[i], v[i+1])
 		}
 	}
 }
@@ -153,12 +146,5 @@ func WithExponentialBackoffDecorrelatedJitterStrategy(base, cap time.Duration) s
 func AddRetryHooks(hooks ...RetryHook) setter {
 	return func(c *Cast) {
 		c.retryHooks = append(c.retryHooks, hooks...)
-	}
-}
-
-// WithDumpBodyLimit sets the maximum dump body limit in bytes.
-func WithDumpBodyLimit(limit int64) setter {
-	return func(c *Cast) {
-		c.dumpBodyLimit = limit
 	}
 }

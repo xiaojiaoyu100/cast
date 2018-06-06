@@ -10,11 +10,12 @@ import (
 	"path/filepath"
 
 	"github.com/google/go-querystring/query"
+	"bytes"
 )
 
 type requestBody interface {
 	ContentType() string
-	Body() (io.Reader, error)
+	Body() ([]byte, error)
 }
 
 type requestJsonBody struct {
@@ -25,12 +26,8 @@ func (body *requestJsonBody) ContentType() string {
 	return applicaionJson
 }
 
-func (body *requestJsonBody) Body() (io.Reader, error) {
-	buffer := getBuffer()
-	if err := json.NewEncoder(buffer).Encode(body.payload); err != nil {
-		return nil, err
-	}
-	return buffer, nil
+func (body *requestJsonBody) Body() ([]byte, error) {
+	return json.Marshal(body.payload)
 }
 
 type requestFormUrlEncodedBody struct {
@@ -41,26 +38,20 @@ func (body *requestFormUrlEncodedBody) ContentType() string {
 	return formUrlEncoded
 }
 
-func (body *requestFormUrlEncodedBody) Body() (io.Reader, error) {
+func (body *requestFormUrlEncodedBody) Body() ([]byte, error) {
 	values, err := query.Values(body.payload)
 	if err != nil {
 		return nil, err
 	}
-	buffer := getBuffer()
-	buffer.WriteString(values.Encode())
-	return buffer, nil
+	return []byte(values.Encode()), nil
 }
 
 type requestXmlBody struct {
 	payload interface{}
 }
 
-func (body *requestXmlBody) Body() (io.Reader, error) {
-	buffer := getBuffer()
-	if err := xml.NewEncoder(buffer).Encode(body.payload); err != nil {
-		return nil, err
-	}
-	return buffer, nil
+func (body *requestXmlBody) Body() ([]byte, error) {
+	return xml.Marshal(body.payload)
 }
 
 func (body *requestXmlBody) ContentType() string {
@@ -75,10 +66,8 @@ func (body *requestPlainBody) ContentType() string {
 	return textPlain
 }
 
-func (body *requestPlainBody) Body() (io.Reader, error) {
-	buffer := getBuffer()
-	buffer.WriteString(body.payload)
-	return buffer, nil
+func (body *requestPlainBody) Body() ([]byte, error) {
+	return []byte(body.payload), nil
 }
 
 type FormData struct {
@@ -98,9 +87,8 @@ func (body *requestMultipartFormDataBody) ContentType() string {
 	return body.contentType
 }
 
-func (body *requestMultipartFormDataBody) Body() (io.Reader, error) {
-	buffer := getBuffer()
-
+func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
+	buffer := &bytes.Buffer{}
 	w := multipart.NewWriter(buffer)
 	defer w.Close()
 
@@ -149,5 +137,5 @@ func (body *requestMultipartFormDataBody) Body() (io.Reader, error) {
 		}
 	}
 	body.contentType = w.FormDataContentType()
-	return buffer, nil
+	return buffer.Bytes(), nil
 }

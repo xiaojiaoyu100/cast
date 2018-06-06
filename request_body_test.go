@@ -1,12 +1,9 @@
 package cast
 
 import (
-	"bytes"
-	"encoding/json"
-	"encoding/xml"
-	"io/ioutil"
 	"testing"
-
+	"encoding/xml"
+	"bytes"
 	"github.com/google/go-querystring/query"
 )
 
@@ -16,36 +13,7 @@ func TestReqJsonBody_ContentType(t *testing.T) {
 }
 
 func TestReqJsonBody_Body(t *testing.T) {
-	type payload struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-	}
 
-	var p payload
-	p.Code = 0
-	p.Msg = "ok"
-	reqJsonBody := requestJsonBody{
-		payload: p,
-	}
-
-	body, err := reqJsonBody.Body()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	bytes, err := ioutil.ReadAll(body)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var b payload
-	if err := json.Unmarshal(bytes, &b); err != nil {
-		t.Fatal(err)
-	}
-
-	if p.Code != b.Code || p.Msg != b.Msg {
-		t.Fatal("unexpected body")
-	}
 }
 
 func TestReqFormUrlEncodedBody_ContentType(t *testing.T) {
@@ -72,17 +40,12 @@ func TestReqFormUrlEncodedBody_Body(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bytes, err := ioutil.ReadAll(body)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	values, err := query.Values(&p)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if values.Encode() != string(bytes) {
+	if values.Encode() != string(body) {
 		t.Fatal("unexpected return")
 	}
 }
@@ -113,18 +76,13 @@ func TestReqXmlBody_Body(t *testing.T) {
 	body, err := xmlBody.Body()
 	ok(t, err)
 
-	bodyBytes, err := ioutil.ReadAll(body)
-	ok(t, err)
-
 	var buffer bytes.Buffer
 	err = xml.NewEncoder(&buffer).Encode(v)
 	ok(t, err)
 
-	t.Log(string(bodyBytes))
-
 	t.Log(string(buffer.String()))
 
-	assert(t, string(bodyBytes) == buffer.String(), "unexpected Body()")
+	assert(t, string(body) == buffer.String(), "unexpected Body()")
 
 }
 
@@ -141,10 +99,7 @@ func TestReqPlainBody_Body(t *testing.T) {
 	body, err := plainBody.Body()
 	ok(t, err)
 
-	bodyBytes, err := ioutil.ReadAll(body)
-	ok(t, err)
-
-	assert(t, string(bodyBytes) == "xssfddfdfdfdfdsfds", "unexpected Body()")
+	assert(t, string(body) == "xssfddfdfdfdfdsfds", "unexpected Body()")
 }
 
 func TestReqPlainBody_ContentType(t *testing.T) {

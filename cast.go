@@ -4,16 +4,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
-)
-
-var (
-	defaultClient = &http.Client{
-		Timeout: 10 * time.Second,
-	}
+	"bytes"
 )
 
 const (
-	defaultDumpBodyLimit int64 = 8192
+	defaultDumpBodyLimit int = 8192
 )
 
 // Cast provides a set of rules to its request.
@@ -30,17 +25,19 @@ type Cast struct {
 	requestHooks       []requestHook
 	responseHooks      []responseHook
 	retryHooks         []RetryHook
-	dumpBodyLimit      int64
+	dumpFlag           int
 }
 
 func New(sl ...setter) *Cast {
 	c := new(Cast)
-	c.client = defaultClient
+	c.client = &http.Client{
+		Timeout: 10 * time.Second,
+	}
 	c.header = make(http.Header)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
 	c.requestHooks = defaultRequestHooks
 	c.responseHooks = defaultResponseHooks
-	c.dumpBodyLimit = defaultDumpBodyLimit
+	c.dumpFlag = fStd
 
 	for _, s := range sl {
 		s(c)
@@ -56,9 +53,9 @@ func (c *Cast) NewRequest() *Request {
 
 // Do initiates a request.
 func (c *Cast) Do(request *Request) (*Response, error) {
-	reqBody, err := request.reqBody()
-	defer putBuffer(reqBody)
+	body, err := request.reqBody()
 	if err != nil {
+		globalLogger.printf("ERROR [%v]", err)
 		return nil, err
 	}
 
@@ -68,7 +65,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseUrl+request.path, reqBody)
+	request.rawRequest, err = http.NewRequest(request.method, c.baseUrl + request.path, bytes.NewReader(body))
 	if err != nil {
 		globalLogger.printf("ERROR [%v]", err)
 		return nil, err
@@ -91,8 +88,8 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 func (c *Cast) genReply(request *Request) (*Response, error) {
 	var (
 		rawResponse *http.Response
-		count       = 0
-		err         error
+		count = 0
+		err error
 	)
 
 	for {
@@ -112,7 +109,7 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 			}
 		}
 
-		if (isRetry && count <= c.retry+1) || err != nil {
+		if (isRetry && count <= c.retry + 1) || err != nil {
 			if rawResponse != nil {
 				rawResponse.Body.Close()
 			}
@@ -131,27 +128,29 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 	}
 	defer rawResponse.Body.Close()
 
+	repBody, err := ioutil.ReadAll(rawResponse.Body)
+	if err != nil {
+		globalLogger.printf("ERROR [%v]", err)
+		return nil, err
+	}
+
+	request.prof.requestDone = time.Now().In(time.UTC)
+	request.prof.requestCost = request.prof.requestDone.Sub(request.prof.requestStart)
+
+	request.prof.receivingDone = time.Now().In(time.UTC)
+	request.prof.receivingCost = request.prof.receivingDone.Sub(request.prof.receivingSart)
+
 	resp := new(Response)
 	resp.request = request
 	resp.rawResponse = rawResponse
 	resp.statusCode = rawResponse.StatusCode
-	resp.start = request.start
-	resp.end = time.Now().In(time.UTC)
-	resp.cost = resp.end.Sub(resp.start)
-	resp.times = count
+	resp.body = repBody
 
 	for _, hook := range c.responseHooks {
 		if err := hook(c, resp); err != nil {
 			return nil, err
 		}
 	}
-
-	repBody, err := ioutil.ReadAll(rawResponse.Body)
-	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
-		return nil, err
-	}
-	resp.body = repBody
 
 	return resp, nil
 }

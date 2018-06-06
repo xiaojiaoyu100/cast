@@ -7,14 +7,6 @@ import (
 	"testing"
 )
 
-func TestWithClient(t *testing.T) {
-	client := &http.Client{}
-	cast := New(WithClient(client))
-	if cast.client != client {
-		t.Fatal("fail to initialize cast http client.")
-	}
-}
-
 func TestWithBasicAuth(t *testing.T) {
 	u := make([]byte, 10)
 	_, err := rand.Read(u)

@@ -2,14 +2,13 @@ package cast
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
 
-	"fmt"
-
-	"net/http/httputil"
-
+	"crypto/tls"
 	"github.com/google/go-querystring/query"
+	"net/http/httptrace"
 )
 
 type requestHook func(cast *Cast, request *Request) error
@@ -20,7 +19,7 @@ var defaultRequestHooks = []requestHook{
 	addCookies,
 	finalizeHeaderIfAny,
 	setTimeoutIfAny,
-	dumpRequest,
+	clientTrace,
 }
 
 func finalizeQueryParamIfAny(cast *Cast, request *Request) error {
@@ -91,21 +90,44 @@ func setTimeoutIfAny(cast *Cast, request *Request) error {
 	return nil
 }
 
-func dumpRequest(cast *Cast, request *Request) error {
-	if !globalLogger.debug {
-		return nil
+func clientTrace(cast *Cast, request *Request) error {
+	trace := &httptrace.ClientTrace{
+		GotFirstResponseByte: func() {
+			request.prof.waitingDone = time.Now().In(time.UTC)
+			request.prof.waitingCost = request.prof.waitingDone.Sub(request.prof.waitingStart)
+			request.prof.receivingSart = time.Now().In(time.UTC)
+		},
+		DNSStart: func(httptrace.DNSStartInfo) {
+			request.prof.dnsStart = time.Now().In(time.UTC)
+		},
+		DNSDone: func(httptrace.DNSDoneInfo) {
+			request.prof.dnsDone = time.Now().In(time.UTC)
+			request.prof.dnsCost = request.prof.dnsDone.Sub(request.prof.dnsStart)
+		},
+		ConnectStart: func(network, addr string) {
+			request.prof.connectStart = time.Now().In(time.UTC)
+		},
+		ConnectDone: func(network, addr string, err error) {
+			request.prof.connectDone = time.Now().In(time.UTC)
+			request.prof.connectCost = request.prof.connectDone.Sub(request.prof.connectStart)
+			request.remoteAddress = addr
+		},
+		TLSHandshakeStart: func() {
+			request.prof.tlsHandshakeStart = time.Now().In(time.UTC)
+		},
+		TLSHandshakeDone: func(tls.ConnectionState, error) {
+			request.prof.tlsHandshakeDone = time.Now().In(time.UTC)
+			request.prof.tlsHandshakeCost = request.prof.tlsHandshakeDone.Sub(request.prof.tlsHandshakeStart)
+		},
+		WroteHeaders: func() {
+			request.prof.sendingStart = time.Now().In(time.UTC)
+		},
+		WroteRequest: func(httptrace.WroteRequestInfo) {
+			request.prof.sendingDone = time.Now().In(time.UTC)
+			request.prof.sendingCost = request.prof.sendingDone.Sub(request.prof.sendingStart)
+			request.prof.waitingStart = time.Now().In(time.UTC)
+		},
 	}
-
-	if request.rawRequest.ContentLength > cast.dumpBodyLimit {
-		return nil
-	}
-
-	bytes, err := httputil.DumpRequest(request.rawRequest, true)
-	if err != nil {
-		return err
-	}
-
-	globalLogger.printf("%s", bytes)
-
+	request.rawRequest = request.rawRequest.WithContext(httptrace.WithClientTrace(request.rawRequest.Context(), trace))
 	return nil
 }

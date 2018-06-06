@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/xiaojiaoyu100/cast"
+	"log"
 )
 
 func main() {

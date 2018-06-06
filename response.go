@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
-	"time"
 )
 
 // Response wraps the raw response with attributes.
@@ -13,10 +12,6 @@ type Response struct {
 	rawResponse *http.Response
 	statusCode  int
 	body        []byte
-	start       time.Time
-	end         time.Time
-	cost        time.Duration
-	times       int
 }
 
 // StatusCode returns http status code.
@@ -67,17 +62,7 @@ func (resp *Response) StatusOk() bool {
 	return resp.statusCode == http.StatusOK
 }
 
-// Start returns the beginning time of a request.
-func (resp *Response) Start() time.Time {
-	return resp.start
-}
-
-// Start returns the end time of a request.
-func (resp *Response) End() time.Time {
-	return resp.end
-}
-
-// Cost returns the cost time of a request.
-func (resp *Response) Cost() time.Duration {
-	return resp.cost
+// Success() returns true if http status code is in [200,299], otherwise false.
+func (resp *Response) Success() bool {
+	return resp.statusCode <= 299 && resp.statusCode >= 200
 }

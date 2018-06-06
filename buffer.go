@@ -1,9 +1,8 @@
 package cast
 
 import (
-	"bytes"
-	"io"
 	"sync"
+	"bytes"
 )
 
 var bufferPool = &sync.Pool{
@@ -16,16 +15,7 @@ func getBuffer() *bytes.Buffer {
 	return bufferPool.Get().(*bytes.Buffer)
 }
 
-func putBuffer(reader io.Reader) {
-	if reader == nil {
-		return
-	}
-
-	buffer, ok := reader.(*bytes.Buffer)
-	if !ok {
-		return
-	}
-
+func putBuffer(buffer *bytes.Buffer) {
 	buffer.Reset()
 	bufferPool.Put(buffer)
 }

@@ -1,30 +1,57 @@
 package cast
 
 import (
-	"io"
 	"net/http"
 	"time"
 )
 
+type profiling struct {
+	requestStart      time.Time
+	requestDone       time.Time
+	requestCost       time.Duration
+	dnsStart          time.Time
+	dnsDone           time.Time
+	dnsCost           time.Duration
+	connectStart      time.Time
+	connectDone       time.Time
+	connectCost       time.Duration
+	tlsHandshakeStart time.Time
+	tlsHandshakeDone  time.Time
+	tlsHandshakeCost  time.Duration
+	sendingStart      time.Time
+	sendingDone       time.Time
+	sendingCost       time.Duration
+	waitingStart      time.Time
+	waitingDone       time.Time
+	waitingCost       time.Duration
+	receivingSart     time.Time
+	receivingDone     time.Time
+	receivingCost     time.Duration
+}
+
 // Request is the http.Request wrapper with attributes.
 type Request struct {
-	path       string
-	method     string
-	header     http.Header
-	queryParam interface{}
-	pathParam  map[string]interface{}
-	body       requestBody
-	timeout    time.Duration
-	start      time.Time
-	rawRequest *http.Request
+	path          string
+	method        string
+	header        http.Header
+	queryParam    interface{}
+	pathParam     map[string]interface{}
+	body          requestBody
+	timeout       time.Duration
+	remoteAddress string
+	prof          profiling
+	rawRequest    *http.Request
 }
 
 // NewRequest returns an instance of of Request.
 func NewRequest() *Request {
 	return &Request{
+		method: http.MethodGet,
 		header:    make(http.Header),
 		pathParam: make(map[string]interface{}),
-		start:     time.Now().In(time.UTC),
+		prof: profiling{
+			requestStart: time.Now().In(time.UTC),
+		},
 	}
 }
 
@@ -147,37 +174,35 @@ func (r *Request) WithTimeout(timeout time.Duration) *Request {
 }
 
 // SetHeader sets the key, value pair list.
-func (r *Request) SetHeader(vv ...string) {
-	if len(vv)%2 != 0 {
-		return
+func (r *Request) SetHeader(vv ...string) *Request {
+	if len(vv) % 2 != 0 {
+		return r
 	}
 
 	for i := 0; i < len(vv); i += 2 {
-		r.header.Set(vv[i], vv[i+1])
+		r.header.Set(vv[i], vv[i + 1])
 	}
+	return r
 }
 
 // AddHeader adds the key, value pair list.
 func (r *Request) AddHeader(vv ...string) {
-	if len(vv)%2 != 0 {
+	if len(vv) % 2 != 0 {
 		return
 	}
 	for i := 0; i < len(vv); i += 2 {
-		r.header.Add(vv[i], vv[i+1])
+		r.header.Add(vv[i], vv[i + 1])
 	}
 }
 
-func (r *Request) reqBody() (io.Reader, error) {
-	var (
-		reqBody io.Reader
-		err     error
-	)
-	if r.body != nil {
-		reqBody, err = r.body.Body()
-		if err != nil {
-			globalLogger.printf("ERROR [%v]", err)
-			return nil, err
-		}
+func (r *Request) reqBody() ([]byte, error) {
+	if r.body == nil {
+		return nil, nil
 	}
-	return reqBody, nil
+	body, err := r.body.Body()
+	if err != nil {
+		globalLogger.printf("ERROR [%v]", err)
+		return nil, err
+	}
+	return body, nil
 }
