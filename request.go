@@ -46,7 +46,7 @@ type Request struct {
 // NewRequest returns an instance of of Request.
 func NewRequest() *Request {
 	return &Request{
-		method: http.MethodGet,
+		method:    http.MethodGet,
 		header:    make(http.Header),
 		pathParam: make(map[string]interface{}),
 		prof: profiling{
@@ -173,25 +173,31 @@ func (r *Request) WithTimeout(timeout time.Duration) *Request {
 	return r
 }
 
+// WithHeader replaces the request header.
+func (r *Request) WithHeader(header http.Header) *Request {
+	r.header = header
+	return r
+}
+
 // SetHeader sets the key, value pair list.
 func (r *Request) SetHeader(vv ...string) *Request {
-	if len(vv) % 2 != 0 {
+	if len(vv)%2 != 0 {
 		return r
 	}
 
 	for i := 0; i < len(vv); i += 2 {
-		r.header.Set(vv[i], vv[i + 1])
+		r.header.Set(vv[i], vv[i+1])
 	}
 	return r
 }
 
 // AddHeader adds the key, value pair list.
 func (r *Request) AddHeader(vv ...string) {
-	if len(vv) % 2 != 0 {
+	if len(vv)%2 != 0 {
 		return
 	}
 	for i := 0; i < len(vv); i += 2 {
-		r.header.Add(vv[i], vv[i + 1])
+		r.header.Add(vv[i], vv[i+1])
 	}
 }
 

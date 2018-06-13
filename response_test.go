@@ -43,3 +43,26 @@ func TestResponse_Success(t *testing.T) {
 		assert(t, response.Success() == tt.want, "%d: unexpected Success()", i)
 	}
 }
+
+func TestResponse_String(t *testing.T) {
+	tests := [...]struct {
+		body []byte
+		want string
+	}{
+		0: {
+			body: []byte("ss"),
+			want: "ss",
+		},
+		1: {
+			body: nil,
+			want: "",
+		},
+	}
+
+	for i, tt := range tests {
+		response := new(Response)
+		response.body = tt.body
+		assert(t, response.String() == tt.want, "%d: unexpected String()", i)
+	}
+
+}

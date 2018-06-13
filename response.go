@@ -31,6 +31,11 @@ func (resp *Response) Body() []byte {
 	return resp.body
 }
 
+// String returns the underlying body in string.
+func (resp *Response) String() string {
+	return string(resp.body)
+}
+
 // DecodeFromJson decodes the JSON body into data variable.
 func (resp *Response) DecodeFromJson(v interface{}) error {
 	return json.Unmarshal(resp.body, &v)
