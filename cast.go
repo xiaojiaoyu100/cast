@@ -36,13 +36,10 @@ func New(sl ...setter) *Cast {
 	c.requestHooks = defaultRequestHooks
 	c.responseHooks = defaultResponseHooks
 	c.dumpFlag = fStd
+	c.httpClientTimeout = 60 * time.Second
 
 	for _, s := range sl {
 		s(c)
-	}
-
-	if c.httpClientTimeout == 0 {
-		c.httpClientTimeout = 60 * time.Second
 	}
 
 	c.client = &http.Client{
