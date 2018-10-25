@@ -31,9 +31,6 @@ type Cast struct {
 
 func New(sl ...setter) *Cast {
 	c := new(Cast)
-	c.client = &http.Client{
-		Timeout: 60 * time.Second,
-	}
 	c.header = make(http.Header)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
 	c.requestHooks = defaultRequestHooks
@@ -42,6 +39,14 @@ func New(sl ...setter) *Cast {
 
 	for _, s := range sl {
 		s(c)
+	}
+
+	if c.httpClientTimeout == 0 {
+		c.httpClientTimeout = 60 * time.Second
+	}
+
+	c.client = &http.Client{
+		Timeout: c.httpClientTimeout,
 	}
 
 	return c
