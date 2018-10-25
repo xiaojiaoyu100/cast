@@ -1,10 +1,10 @@
 package cast
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"bytes"
 )
 
 const (
@@ -26,12 +26,13 @@ type Cast struct {
 	responseHooks      []responseHook
 	retryHooks         []RetryHook
 	dumpFlag           int
+	httpClientTimeout  time.Duration
 }
 
 func New(sl ...setter) *Cast {
 	c := new(Cast)
 	c.client = &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 60 * time.Second,
 	}
 	c.header = make(http.Header)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
@@ -65,7 +66,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseUrl + request.path, bytes.NewReader(body))
+	request.rawRequest, err = http.NewRequest(request.method, c.baseUrl+request.path, bytes.NewReader(body))
 	if err != nil {
 		globalLogger.printf("ERROR [%v]", err)
 		return nil, err
@@ -88,8 +89,8 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 func (c *Cast) genReply(request *Request) (*Response, error) {
 	var (
 		rawResponse *http.Response
-		count = 0
-		err error
+		count       = 0
+		err         error
 	)
 
 	for {
@@ -109,7 +110,7 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 			}
 		}
 
-		if (isRetry && count <= c.retry + 1) || err != nil {
+		if (isRetry && count <= c.retry+1) || err != nil {
 			if rawResponse != nil {
 				rawResponse.Body.Close()
 			}

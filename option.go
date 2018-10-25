@@ -148,3 +148,10 @@ func AddRetryHooks(hooks ...RetryHook) setter {
 		c.retryHooks = append(c.retryHooks, hooks...)
 	}
 }
+
+// WithHttpClientTimeout sets the underlying http client timeout.
+func WithHttpClientTimeout(timeout time.Duration) setter {
+	return func(c *Cast) {
+		c.httpClientTimeout = timeout
+	}
+}

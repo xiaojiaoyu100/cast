@@ -5,6 +5,7 @@ import (
 	rand2 "math/rand"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestWithBasicAuth(t *testing.T) {
@@ -60,4 +61,13 @@ func TestWithRetry(t *testing.T) {
 	if cast.retry != retry {
 		t.Fatal("fail to initialize retry.")
 	}
+}
+
+func TestWithHttpClientTimeout(t *testing.T) {
+	timeout := 1 * time.Second
+	cast := New(WithHttpClientTimeout(timeout))
+	if cast.httpClientTimeout != timeout {
+		t.Fatal("fail to initialize http client timeout")
+	}
+
 }
