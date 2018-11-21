@@ -36,7 +36,7 @@ func New(sl ...setter) *Cast {
 	c.requestHooks = defaultRequestHooks
 	c.responseHooks = defaultResponseHooks
 	c.dumpFlag = fStd
-	c.httpClientTimeout = 60 * time.Second
+	c.httpClientTimeout = 10 * time.Second
 
 	for _, s := range sl {
 		s(c)
@@ -44,6 +44,13 @@ func New(sl ...setter) *Cast {
 
 	c.client = &http.Client{
 		Timeout: c.httpClientTimeout,
+	}
+
+	roundTripper := http.DefaultTransport
+	transport, ok := roundTripper.(*http.Transport)
+	if ok {
+		transport.MaxIdleConns = 100
+		transport.MaxIdleConnsPerHost = 100
 	}
 
 	return c
