@@ -38,8 +38,8 @@ func TestWithBearerToken(t *testing.T) {
 
 func TestWithBaseUrl(t *testing.T) {
 	u := "https://www.xiaozhibo.com"
-	cast := New(WithBaseUrl(u))
-	if cast.baseUrl != u {
+	cast := New(WithBaseURL(u))
+	if cast.baseUURL != u {
 		t.Fatal("fail to initialize baseUrl.")
 	}
 }
@@ -55,6 +55,40 @@ func TestWithHeader(t *testing.T) {
 	}
 }
 
+func TestSetHeader(t *testing.T) {
+	c := New()
+	SetHeader("Content-Type", "text/plain", "application/json")(c)
+	if len(c.header["Content-Type"]) != 0 {
+		t.Fatal("SetHeader error")
+	}
+
+	SetHeader("Content-Type", "text/plain", "Content-Type", "application/json")(c)
+	if len(c.header["Content-Type"]) != 1 {
+		t.Fatal("SetHeader error")
+	}
+
+	if c.header.Get("Content-Type") != "application/json" {
+		t.Fatal("SetHeader error")
+	}
+}
+
+func TestAddHeader(t *testing.T) {
+	c := New()
+	AddHeader("Content-Type", "text/plain", "application/json")(c)
+	if len(c.header["Content-Type"]) != 0 {
+		t.Fatal("AddHeader error")
+	}
+
+	AddHeader("Content-Type", "text/plain", "Content-Type", "application/json")(c)
+	if len(c.header["Content-Type"]) != 2 {
+		t.Fatal("AddHeader error")
+	}
+
+	if c.header.Get("Content-Type") != "text/plain" {
+		t.Fatal("AddHeader error")
+	}
+}
+
 func TestWithRetry(t *testing.T) {
 	retry := rand2.Intn(10) + 1
 	cast := New(WithRetry(retry))
@@ -65,7 +99,7 @@ func TestWithRetry(t *testing.T) {
 
 func TestWithHttpClientTimeout(t *testing.T) {
 	timeout := 1 * time.Second
-	cast := New(WithHttpClientTimeout(timeout))
+	cast := New(WithHTTPClientTimeout(timeout))
 	if cast.httpClientTimeout != timeout {
 		t.Fatal("fail to initialize http client timeout")
 	}

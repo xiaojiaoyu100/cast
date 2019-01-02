@@ -1,8 +1,8 @@
 package cast
 
 import (
-	"sync"
 	"bytes"
+	"sync"
 )
 
 var bufferPool = &sync.Pool{

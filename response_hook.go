@@ -18,7 +18,7 @@ func dump(cast *Cast, response *Response) error {
 	buffer := getBuffer()
 	defer putBuffer(buffer)
 
-	shouldPrintHeaders := cast.dumpFlag & fHeader != 0
+	shouldPrintHeaders := cast.dumpFlag&fHeader != 0
 	if shouldPrintHeaders {
 		fmt.Fprintf(buffer, "\nHeaders\n")
 		fmt.Fprintf(buffer, "Request URL: %s\n", response.request.rawRequest.URL.String())
@@ -33,7 +33,7 @@ func dump(cast *Cast, response *Response) error {
 		fmt.Fprintf(buffer, "\n")
 	}
 
-	shouldPrintParams := cast.dumpFlag & fParam != 0
+	shouldPrintParams := cast.dumpFlag&fParam != 0
 	if shouldPrintParams && len(response.body) <= defaultDumpBodyLimit {
 		fmt.Fprintf(buffer, "Params\n")
 		if response.request.body != nil {
@@ -44,14 +44,14 @@ func dump(cast *Cast, response *Response) error {
 
 	}
 
-	shouldPrintResponse := cast.dumpFlag & fResponse != 0
+	shouldPrintResponse := cast.dumpFlag&fResponse != 0
 	if shouldPrintResponse && len(response.body) <= defaultDumpBodyLimit {
 		fmt.Fprintf(buffer, "Response\n")
 		fmt.Fprintf(buffer, string(response.body))
 		fmt.Fprintf(buffer, "\n\n")
 	}
 
-	shouldPrintTimings := cast.dumpFlag & fTiming != 0
+	shouldPrintTimings := cast.dumpFlag&fTiming != 0
 	if shouldPrintTimings {
 		fmt.Fprintf(buffer, "Timings\n")
 		fmt.Fprintf(buffer, "DNS resolution: %s\n", response.request.prof.dnsCost)

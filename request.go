@@ -81,9 +81,9 @@ func (r *Request) Head() *Request {
 }
 
 // Post sets the following http request method to "POST".
-func (c *Request) Post() *Request {
-	c.method = http.MethodPost
-	return c
+func (r *Request) Post() *Request {
+	r.method = http.MethodPost
+	return r
 }
 
 // Put sets the following http request method to "PUT".
@@ -128,17 +128,17 @@ func (r *Request) WithPathParam(pathParam map[string]interface{}) *Request {
 	return r
 }
 
-// WithJsonBody creates body with JSON.
-func (r *Request) WithJsonBody(body interface{}) *Request {
-	r.body = &requestJsonBody{
+// WithJSONBody creates body with JSON.
+func (r *Request) WithJSONBody(body interface{}) *Request {
+	r.body = &requestJSONBody{
 		payload: body,
 	}
 	return r
 }
 
-// WithXmlBody creates body with XML.
-func (r *Request) WithXmlBody(body interface{}) *Request {
-	r.body = &requestXmlBody{
+// WithXMLBody creates body with XML.
+func (r *Request) WithXMLBody(body interface{}) *Request {
+	r.body = &requestXMLBody{
 		payload: body,
 	}
 	return r
@@ -152,14 +152,15 @@ func (r *Request) WithPlainBody(body string) *Request {
 	return r
 }
 
-// WithFormUrlEncodedBody creates body with url encoded string.
-func (r *Request) WithFormUrlEncodedBody(body interface{}) *Request {
-	r.body = &requestFormUrlEncodedBody{
+// WithFormURLEncodedBody creates body with url encoded string.
+func (r *Request) WithFormURLEncodedBody(body interface{}) *Request {
+	r.body = &requestFormURLEncodedBody{
 		payload: body,
 	}
 	return r
 }
 
+// WithMultipartFormDataBody create body with form data
 func (r *Request) WithMultipartFormDataBody(formData ...*FormData) *Request {
 	r.body = &requestMultipartFormDataBody{
 		formData: formData,

@@ -67,7 +67,7 @@ func Test_setRequestHeader(t *testing.T) {
 		want    string
 	}{
 		0: {
-			request: c.NewRequest().WithJsonBody(&jsonBody).Post(),
+			request: c.NewRequest().WithJSONBody(&jsonBody).Post(),
 			want:    "application/json; charset=utf-8",
 		},
 		1: {
@@ -75,7 +75,7 @@ func Test_setRequestHeader(t *testing.T) {
 			want:    "text/plain; charset=utf-8",
 		},
 		2: {
-			request: c.NewRequest().WithXmlBody(xmlBody).Post(),
+			request: c.NewRequest().WithXMLBody(xmlBody).Post(),
 			want:    "application/xml; charset=utf-8",
 		},
 	}

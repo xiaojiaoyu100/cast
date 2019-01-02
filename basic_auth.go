@@ -1,5 +1,6 @@
 package cast
 
+// BasicAuth provides info to authenticate
 type BasicAuth struct {
 	username string
 	password string

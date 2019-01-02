@@ -1,7 +1,8 @@
 package cast
 
-type CastError string
+// Error defines cast error
+type Error string
 
-func (err CastError) Error() string {
+func (err Error) Error() string {
 	return string(err)
 }

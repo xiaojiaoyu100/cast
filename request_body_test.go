@@ -1,15 +1,16 @@
 package cast
 
 import (
-	"testing"
-	"encoding/xml"
 	"bytes"
+	"encoding/xml"
+	"testing"
+
 	"github.com/google/go-querystring/query"
 )
 
 func TestReqJsonBody_ContentType(t *testing.T) {
-	reqJsonBody := requestJsonBody{}
-	assert(t, reqJsonBody.ContentType() == "application/json; charset=utf-8", "unexpected json ContentType()")
+	reqJSONBody := requestJSONBody{}
+	assert(t, reqJSONBody.ContentType() == "application/json; charset=utf-8", "unexpected json ContentType()")
 }
 
 func TestReqJsonBody_Body(t *testing.T) {
@@ -17,7 +18,7 @@ func TestReqJsonBody_Body(t *testing.T) {
 }
 
 func TestReqFormUrlEncodedBody_ContentType(t *testing.T) {
-	formBody := requestFormUrlEncodedBody{}
+	formBody := requestFormURLEncodedBody{}
 	assert(t, formBody.ContentType() == "application/x-www-form-urlencoded", "unexpected form urlencoded ContentType()")
 }
 
@@ -31,7 +32,7 @@ func TestReqFormUrlEncodedBody_Body(t *testing.T) {
 	p.Code = 0
 	p.Msg = "ok"
 
-	req := requestFormUrlEncodedBody{
+	req := requestFormURLEncodedBody{
 		payload: p,
 	}
 
@@ -56,20 +57,20 @@ func TestReqXmlBody_Body(t *testing.T) {
 	}
 	type Person struct {
 		XMLName   xml.Name `xml:"person"`
-		Id        int      `xml:"id,attr"`
+		ID        int      `xml:"id,attr"`
 		FirstName string   `xml:"name>first"`
 		LastName  string   `xml:"name>last"`
 		Age       int      `xml:"age"`
 		Height    float32  `xml:"height,omitempty"`
 		Married   bool
 		Address
-		Comment   string `xml:",comment"`
+		Comment string `xml:",comment"`
 	}
-	v := &Person{Id: 13, FirstName: "John", LastName: "Doe", Age: 42}
+	v := &Person{ID: 13, FirstName: "John", LastName: "Doe", Age: 42}
 	v.Comment = " Need more details. "
 	v.Address = Address{"Hanga Roa", "Easter Island"}
 
-	xmlBody := requestXmlBody{
+	xmlBody := requestXMLBody{
 		payload: v,
 	}
 
@@ -87,8 +88,8 @@ func TestReqXmlBody_Body(t *testing.T) {
 }
 
 func TestReqXmlBody_ContentType(t *testing.T) {
-	reqXmlBody := requestXmlBody{}
-	assert(t, reqXmlBody.ContentType() == "application/xml; charset=utf-8", "unexpected xml ContentType()")
+	reqXMLBody := requestXMLBody{}
+	assert(t, reqXMLBody.ContentType() == "application/xml; charset=utf-8", "unexpected xml ContentType()")
 }
 
 func TestReqPlainBody_Body(t *testing.T) {

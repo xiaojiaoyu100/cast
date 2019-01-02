@@ -2,6 +2,7 @@ package cast
 
 import "net/http"
 
+// RetryHook defines a retry cond.
 type RetryHook func(resp *http.Response) bool
 
 // RetryWhenTooManyRequests returns true when http status code is 429, otherwise false.

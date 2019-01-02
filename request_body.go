@@ -9,8 +9,9 @@ import (
 
 	"path/filepath"
 
-	"github.com/google/go-querystring/query"
 	"bytes"
+
+	"github.com/google/go-querystring/query"
 )
 
 type requestBody interface {
@@ -18,27 +19,27 @@ type requestBody interface {
 	Body() ([]byte, error)
 }
 
-type requestJsonBody struct {
+type requestJSONBody struct {
 	payload interface{}
 }
 
-func (body *requestJsonBody) ContentType() string {
-	return applicaionJson
+func (body *requestJSONBody) ContentType() string {
+	return applicaionJSON
 }
 
-func (body *requestJsonBody) Body() ([]byte, error) {
+func (body *requestJSONBody) Body() ([]byte, error) {
 	return json.Marshal(body.payload)
 }
 
-type requestFormUrlEncodedBody struct {
+type requestFormURLEncodedBody struct {
 	payload interface{}
 }
 
-func (body *requestFormUrlEncodedBody) ContentType() string {
-	return formUrlEncoded
+func (body *requestFormURLEncodedBody) ContentType() string {
+	return formURLEncoded
 }
 
-func (body *requestFormUrlEncodedBody) Body() ([]byte, error) {
+func (body *requestFormURLEncodedBody) Body() ([]byte, error) {
 	values, err := query.Values(body.payload)
 	if err != nil {
 		return nil, err
@@ -46,16 +47,16 @@ func (body *requestFormUrlEncodedBody) Body() ([]byte, error) {
 	return []byte(values.Encode()), nil
 }
 
-type requestXmlBody struct {
+type requestXMLBody struct {
 	payload interface{}
 }
 
-func (body *requestXmlBody) Body() ([]byte, error) {
+func (body *requestXMLBody) Body() ([]byte, error) {
 	return xml.Marshal(body.payload)
 }
 
-func (body *requestXmlBody) ContentType() string {
-	return applicationXml
+func (body *requestXMLBody) ContentType() string {
+	return applicationXML
 }
 
 type requestPlainBody struct {
@@ -70,6 +71,7 @@ func (body *requestPlainBody) Body() ([]byte, error) {
 	return []byte(body.payload), nil
 }
 
+// FormData represents multipart
 type FormData struct {
 	FieldName string
 	Value     string

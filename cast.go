@@ -14,7 +14,7 @@ const (
 // Cast provides a set of rules to its request.
 type Cast struct {
 	client             *http.Client
-	baseUrl            string
+	baseUURL           string
 	header             http.Header
 	basicAuth          *BasicAuth
 	bearerToken        string
@@ -29,7 +29,8 @@ type Cast struct {
 	httpClientTimeout  time.Duration
 }
 
-func New(sl ...setter) *Cast {
+// New returns an instance of Cast
+func New(sl ...Setter) *Cast {
 	c := new(Cast)
 	c.header = make(http.Header)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
@@ -75,7 +76,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseUrl+request.path, bytes.NewReader(body))
+	request.rawRequest, err = http.NewRequest(request.method, c.baseUURL+request.path, bytes.NewReader(body))
 	if err != nil {
 		globalLogger.printf("ERROR [%v]", err)
 		return nil, err

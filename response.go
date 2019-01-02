@@ -19,6 +19,7 @@ func (resp *Response) StatusCode() int {
 	return resp.statusCode
 }
 
+//Cookies returns http cookies.
 func (resp *Response) Cookies() []*http.Cookie {
 	if resp.rawResponse == nil {
 		return []*http.Cookie{}
@@ -36,13 +37,13 @@ func (resp *Response) String() string {
 	return string(resp.body)
 }
 
-// DecodeFromJson decodes the JSON body into data variable.
-func (resp *Response) DecodeFromJson(v interface{}) error {
+// DecodeFromJSON decodes the JSON body into data variable.
+func (resp *Response) DecodeFromJSON(v interface{}) error {
 	return json.Unmarshal(resp.body, &v)
 }
 
-// DecodeFromXml decodes the XML body into  data variable.
-func (resp *Response) DecodeFromXml(v interface{}) error {
+// DecodeFromXML decodes the XML body into  data variable.
+func (resp *Response) DecodeFromXML(v interface{}) error {
 	return xml.Unmarshal(resp.body, &v)
 }
 
@@ -67,7 +68,7 @@ func (resp *Response) StatusOk() bool {
 	return resp.statusCode == http.StatusOK
 }
 
-// Success() returns true if http status code is in [200,299], otherwise false.
+// Success returns true if http status code is in [200,299], otherwise false.
 func (resp *Response) Success() bool {
 	return resp.statusCode <= 299 && resp.statusCode >= 200
 }

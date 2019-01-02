@@ -4,15 +4,15 @@ import "testing"
 
 func TestCastError_Error(t *testing.T) {
 	tests := [...]struct {
-		err  CastError
+		err  Error
 		want string
 	}{
 		0: {
-			err:  CastError(""),
+			err:  Error(""),
 			want: "",
 		},
 		1: {
-			err:  CastError("123"),
+			err:  Error("123"),
 			want: "123",
 		},
 	}

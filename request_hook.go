@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"crypto/tls"
-	"github.com/google/go-querystring/query"
 	"net/http/httptrace"
+
+	"github.com/google/go-querystring/query"
 )
 
 type requestHook func(cast *Cast, request *Request) error
