@@ -11,10 +11,6 @@ var defaultResponseHooks = []responseHook{
 }
 
 func dump(cast *Cast, response *Response) error {
-	if !globalLogger.debug {
-		return nil
-	}
-
 	buffer := getBuffer()
 	defer putBuffer(buffer)
 
@@ -66,7 +62,7 @@ func dump(cast *Cast, response *Response) error {
 	}
 
 	if buffer.Len() > 0 {
-		globalLogger.printf("%s", buffer.String())
+		contextLogger.Info(buffer.String())
 	}
 
 	return nil

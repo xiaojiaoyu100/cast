@@ -24,15 +24,17 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/google/go-querystring"
-
 [[constraint]]
   name = "github.com/jtacoma/uritemplates"
-  version = "1.0.0"
+  version = "=1.0.0"
 
 [prune]
-  go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "=1.2.0"
+
+[[constraint]]
+  name = "github.com/google/go-querystring"
+  version = "=1.0.0"

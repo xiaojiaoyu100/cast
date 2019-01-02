@@ -9,14 +9,14 @@ This project is ready for production use and the master branch is always stable.
 
 ## Getting started
 
-    go get github.com/xiaojiaoyu100/cast
+    dep ensure -add github.com/xiaojiaoyu100/cast
     
 ## Usage
 
 ### Generate a Cast
 
 ```go
-c := cast.New(cast.WithBaseUrl("https://status.github.com"))
+c := cast.New(cast.WithBaseURL("https://status.github.com"))
 ```
 
 ### Generate a request
@@ -36,21 +36,21 @@ response, err := c.Do(request)
 ### POST X-WWW-FORM-URLENCODED
 
 ```go
-request := c.NewRequest().Get().WithPath("/api.json").WithFormUrlEncodedBody(body)
+request := c.NewRequest().Get().WithPath("/api.json").WithFormURLEncodedBody(body)
 resp, err := c.Do(request)
 ```
 
 ### POST JSON 
 
 ```go
-request := c.NewRequest().Post().WithPath("/api.json").WithJsonBody(body)
+request := c.NewRequest().Post().WithPath("/api.json").WithJSONBody(body)
 response, err := c.Do(request)
 ```
 
 ### POST XML
 
 ```go
-request := c.NewRequest().Post().WithPath("/api.json").WithXmlBody(body)
+request := c.NewRequest().Post().WithPath("/api.json").WithXMLBody(body)
 response, err := c.Do(request)
 ```
 
@@ -77,12 +77,6 @@ cast.WithRetry(3)
 
 ```go
 cast.WithXXXBackoffStrategy()
-```
-
-### Enable log
-
-```go
-cast.QuickDebug() 
 ```
 
 ## License

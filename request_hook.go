@@ -26,13 +26,13 @@ var defaultRequestHooks = []requestHook{
 func finalizeQueryParamIfAny(cast *Cast, request *Request) error {
 	values, err := url.ParseQuery(request.rawRequest.URL.RawQuery)
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return err
 	}
 
 	qValues, err := query.Values(request.queryParam)
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return err
 	}
 	for k, vv := range qValues {

@@ -15,12 +15,12 @@ func finalizePathIfAny(cast *Cast, request *Request) error {
 	if len(request.pathParam) > 0 {
 		tpl, err := uritemplates.Parse(request.path)
 		if err != nil {
-			globalLogger.printf("ERROR [%v]", err)
+			contextLogger.WithError(err)
 			return err
 		}
 		request.path, err = tpl.Expand(request.pathParam)
 		if err != nil {
-			globalLogger.printf("ERROR [%v]", err)
+			contextLogger.WithError(err)
 			return err
 		}
 	}

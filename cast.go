@@ -66,7 +66,7 @@ func (c *Cast) NewRequest() *Request {
 func (c *Cast) Do(request *Request) (*Response, error) {
 	body, err := request.reqBody()
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return nil, err
 	}
 
@@ -78,7 +78,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 
 	request.rawRequest, err = http.NewRequest(request.method, c.baseUURL+request.path, bytes.NewReader(body))
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return nil, err
 	}
 
@@ -134,14 +134,14 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 	}
 
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return nil, err
 	}
 	defer rawResponse.Body.Close()
 
 	repBody, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return nil, err
 	}
 

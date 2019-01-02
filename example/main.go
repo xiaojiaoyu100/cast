@@ -7,13 +7,10 @@ import (
 )
 
 func main() {
-	cast.QuickDebug()
 	baseUrl := "https://status.github.com"
-	// Get
-	c := cast.New(cast.WithBaseUrl(baseUrl))
+	c := cast.New(cast.WithBaseURL(baseUrl))
 	request := c.NewRequest().Get().WithPath("/api.json")
 	resp, err := c.Do(request)
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -27,7 +24,7 @@ func main() {
 	if !resp.StatusOk() {
 		return
 	}
-	if err := resp.DecodeFromJson(&ApiUrl); err != nil {
+	if err := resp.DecodeFromJSON(&ApiUrl); err != nil {
 		log.Fatalln(err)
 	}
 }

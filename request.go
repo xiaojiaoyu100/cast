@@ -208,7 +208,7 @@ func (r *Request) reqBody() ([]byte, error) {
 	}
 	body, err := r.body.Body()
 	if err != nil {
-		globalLogger.printf("ERROR [%v]", err)
+		contextLogger.WithError(err)
 		return nil, err
 	}
 	return body, nil
