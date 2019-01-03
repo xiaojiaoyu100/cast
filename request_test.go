@@ -18,10 +18,10 @@ func TestRequest_WithHeader(t *testing.T) {
 		},
 		1: {
 			header: map[string][]string{
-				"Content-Type": []string{"application/json"},
+				"Content-Type": {"application/json"},
 			},
 			want: map[string][]string{
-				"Content-Type": []string{"application/json"},
+				"Content-Type": {"application/json"},
 			},
 		},
 	}

@@ -39,7 +39,7 @@ func TestWithBearerToken(t *testing.T) {
 func TestWithBaseUrl(t *testing.T) {
 	u := "https://www.xiaozhibo.com"
 	cast := New(WithBaseURL(u))
-	if cast.baseUURL != u {
+	if cast.baseURL != u {
 		t.Fatal("fail to initialize baseUrl.")
 	}
 }

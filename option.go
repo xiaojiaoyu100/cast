@@ -11,7 +11,7 @@ type Setter func(cast *Cast)
 // WithBaseURL sets the consistent part of your address.
 func WithBaseURL(url string) Setter {
 	return func(c *Cast) {
-		c.baseUURL = url
+		c.baseURL = url
 	}
 }
 

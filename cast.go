@@ -14,7 +14,7 @@ const (
 // Cast provides a set of rules to its request.
 type Cast struct {
 	client             *http.Client
-	baseUURL           string
+	baseURL            string
 	header             http.Header
 	basicAuth          *BasicAuth
 	bearerToken        string
@@ -76,7 +76,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseUURL+request.path, bytes.NewReader(body))
+	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
 	if err != nil {
 		contextLogger.WithError(err)
 		return nil, err
