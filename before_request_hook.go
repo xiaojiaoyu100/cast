@@ -15,12 +15,12 @@ func finalizePathIfAny(cast *Cast, request *Request) error {
 	if len(request.pathParam) > 0 {
 		tpl, err := uritemplates.Parse(request.path)
 		if err != nil {
-			contextLogger.WithError(err)
+			contextLogger.WithError(err).Error("uritemplates.Parse: ", request.path)
 			return err
 		}
 		request.path, err = tpl.Expand(request.pathParam)
 		if err != nil {
-			contextLogger.WithError(err)
+			contextLogger.WithError(err).Error("tpl.Expand: ", request.pathParam)
 			return err
 		}
 	}

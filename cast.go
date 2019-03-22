@@ -66,7 +66,7 @@ func (c *Cast) NewRequest() *Request {
 func (c *Cast) Do(request *Request) (*Response, error) {
 	body, err := request.reqBody()
 	if err != nil {
-		contextLogger.WithError(err)
+		contextLogger.WithError(err).Error("request.reqBody")
 		return nil, err
 	}
 
@@ -78,7 +78,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 
 	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
 	if err != nil {
-		contextLogger.WithError(err)
+		contextLogger.WithError(err).Error("http.NewRequest")
 		return nil, err
 	}
 
@@ -134,14 +134,14 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 	}
 
 	if err != nil {
-		contextLogger.WithError(err)
+		contextLogger.WithError(err).Error("c.client.Do")
 		return nil, err
 	}
 	defer rawResponse.Body.Close()
 
 	repBody, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		contextLogger.WithError(err)
+		contextLogger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
 		return nil, err
 	}
 
@@ -159,6 +159,7 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 
 	for _, hook := range c.responseHooks {
 		if err := hook(c, resp); err != nil {
+			contextLogger.WithError(err).Error("hook(c, resp)")
 			return nil, err
 		}
 	}
