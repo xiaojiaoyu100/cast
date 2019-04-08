@@ -63,7 +63,7 @@ func WithBasicAuth(username, password string) Setter {
 
 // WithCookies replaces the underlying cookies which can be sent to server when initiate a request.
 func WithCookies(cookies ...*http.Cookie) Setter {
-	return func(c *Cast) error  {
+	return func(c *Cast) error {
 		c.cookies = cookies
 		return nil
 	}
