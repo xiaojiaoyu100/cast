@@ -16,7 +16,7 @@ This project is ready for production use and the master branch is always stable.
 ### Generate a Cast
 
 ```go
-c := cast.New(cast.WithBaseURL("https://status.github.com"))
+c, err := cast.New(cast.WithBaseURL("https://status.github.com"))
 ```
 
 ### Generate a request
