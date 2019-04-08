@@ -43,7 +43,10 @@ func Test_finalizePathIfAny(t *testing.T) {
 
 func Test_setRequestHeader(t *testing.T) {
 
-	c := New()
+	c, err := New()
+	if err != nil {
+		t.Errorf("New() error")
+	}
 
 	jsonBody := struct {
 		Code int    `json:"code"`

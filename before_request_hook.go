@@ -4,9 +4,10 @@ import (
 	"github.com/jtacoma/uritemplates"
 )
 
-type beforeRequestHook func(cast *Cast, request *Request) error
+// BeforeRequestHook 请求之前执行的函数
+type BeforeRequestHook func(cast *Cast, request *Request) error
 
-var defaultBeforeRequestHooks = []beforeRequestHook{
+var defaultBeforeRequestHooks = []BeforeRequestHook{
 	finalizePathIfAny,
 	setRequestHeader,
 }

@@ -21,7 +21,7 @@ type Cast struct {
 	cookies            []*http.Cookie
 	retry              int
 	stg                backoffStrategy
-	beforeRequestHooks []beforeRequestHook
+	beforeRequestHooks []BeforeRequestHook
 	requestHooks       []requestHook
 	responseHooks      []responseHook
 	retryHooks         []RetryHook
@@ -30,7 +30,7 @@ type Cast struct {
 }
 
 // New returns an instance of Cast
-func New(sl ...Setter) *Cast {
+func New(sl ...Setter) (*Cast, error) {
 	c := new(Cast)
 	c.header = make(http.Header)
 	c.beforeRequestHooks = defaultBeforeRequestHooks
@@ -40,7 +40,9 @@ func New(sl ...Setter) *Cast {
 	c.httpClientTimeout = 10 * time.Second
 
 	for _, s := range sl {
-		s(c)
+		if err := s(c); err != nil {
+			return nil, err
+		}
 	}
 
 	c.client = &http.Client{
@@ -54,7 +56,7 @@ func New(sl ...Setter) *Cast {
 		transport.MaxIdleConnsPerHost = 100
 	}
 
-	return c
+	return c, nil
 }
 
 // NewRequest returns an instance of Request.
