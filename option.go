@@ -1,6 +1,7 @@
 package cast
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -170,6 +171,17 @@ func AddRetryHooks(hooks ...RetryHook) Setter {
 func WithHTTPClientTimeout(timeout time.Duration) Setter {
 	return func(c *Cast) error {
 		c.httpClientTimeout = timeout
+		return nil
+	}
+}
+
+// AddBeforeRequestHook 添加请求hook
+func AddBeforeRequestHook(hks ...BeforeRequestHook) Setter {
+	return func(c *Cast) error {
+		if len(hks) == 0 {
+			return errors.New("beforeRequestHooks must be even numbers")
+		}
+		c.beforeRequestHooks = append(c.beforeRequestHooks, hks...)
 		return nil
 	}
 }

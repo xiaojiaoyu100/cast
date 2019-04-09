@@ -168,11 +168,3 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 
 	return resp, nil
 }
-
-// AddBeforeRequestHook 添加请求hook
-func (c *Cast) AddBeforeRequestHook(hks ...BeforeRequestHook) {
-	if len(hks) == 0 {
-		return
-	}
-	c.beforeRequestHooks = append(c.beforeRequestHooks, hks...)
-}

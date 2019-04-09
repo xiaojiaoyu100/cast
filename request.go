@@ -212,3 +212,12 @@ func (r *Request) reqBody() ([]byte, error) {
 	}
 	return body, nil
 }
+
+// DoHeaderExist whether specified header exists
+func (r *Request) DoHeaderExist(h string) bool {
+	if r == nil {
+		return false
+	}
+	_, ok := r.header[h]
+	return ok
+}
