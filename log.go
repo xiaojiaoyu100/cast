@@ -6,28 +6,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log = logrus.New()
+var logger = logrus.New()
 
 // LogHook log hook模板
 type LogHook func(entry *logrus.Entry)
 
-var contextLogger = log.WithFields(logrus.Fields{
+var contextLogger = logger.WithFields(logrus.Fields{
 	"source": "cast",
 })
 
 func init() {
-	log.SetFormatter(&logrus.JSONFormatter{
+	logger.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
-	log.SetReportCaller(true)
-	log.SetOutput(os.Stderr)
-	log.SetLevel(logrus.InfoLevel)
+	logger.SetReportCaller(true)
+	logger.SetOutput(os.Stderr)
+	logger.SetLevel(logrus.InfoLevel)
 }
 
 // AddLogHook add a log reporter.
 func AddLogHook(f LogHook) {
 	m := NewMonitor(f)
-	log.AddHook(m)
+	logger.AddHook(m)
 }
 
 // Monitor 信息监控

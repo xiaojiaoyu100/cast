@@ -1,13 +1,33 @@
 package main
 
 import (
-	"github.com/xiaojiaoyu100/cast"
 	"fmt"
+	"time"
+
+	"github.com/xiaojiaoyu100/cast"
 )
+
+func retry(response *cast.Response, err error) bool {
+	if err != nil {
+		return true
+	}
+	if !response.StatusOk() {
+		return true
+	}
+	return false
+}
 
 func main() {
 	baseUrl := "https://status.github.com"
-	c, err := cast.New(cast.WithBaseURL(baseUrl))
+	c, err := cast.New(
+		cast.WithBaseURL(baseUrl),
+		cast.WithRetry(3),
+		cast.AddRetryHooks(retry),
+		cast.WithExponentialBackoffDecorrelatedJitterStrategy(
+			time.Millisecond*200,
+			time.Millisecond*450,
+		),
+	)
 	if err != nil {
 		return
 	}

@@ -1,7 +1,6 @@
 package cast
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -178,9 +177,6 @@ func WithHTTPClientTimeout(timeout time.Duration) Setter {
 // AddBeforeRequestHook 添加请求hook
 func AddBeforeRequestHook(hks ...BeforeRequestHook) Setter {
 	return func(c *Cast) error {
-		if len(hks) == 0 {
-			return errors.New("beforeRequestHooks must be even numbers")
-		}
 		c.beforeRequestHooks = append(c.beforeRequestHooks, hks...)
 		return nil
 	}

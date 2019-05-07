@@ -77,7 +77,7 @@ func finalizeHeaderIfAny(cast *Cast, request *Request) error {
 	return nil
 }
 
-func setTimeoutIfAny(cast *Cast, request *Request) error {
+func setTimeoutIfAny(_ *Cast, request *Request) error {
 	if request.timeout == 0 {
 		return nil
 	}
@@ -91,7 +91,7 @@ func setTimeoutIfAny(cast *Cast, request *Request) error {
 	return nil
 }
 
-func clientTrace(cast *Cast, request *Request) error {
+func clientTrace(_ *Cast, request *Request) error {
 	trace := &httptrace.ClientTrace{
 		GotFirstResponseByte: func() {
 			request.prof.waitingDone = time.Now().In(time.UTC)

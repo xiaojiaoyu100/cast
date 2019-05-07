@@ -36,6 +36,7 @@ func New(sl ...Setter) (*Cast, error) {
 	c.beforeRequestHooks = defaultBeforeRequestHooks
 	c.requestHooks = defaultRequestHooks
 	c.responseHooks = defaultResponseHooks
+	c.retryHooks = defaultRetryHooks
 	c.dumpFlag = fStd
 	c.httpClientTimeout = 10 * time.Second
 
@@ -95,75 +96,73 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		return nil, err
 	}
 
+	for _, hook := range c.responseHooks {
+		if err := hook(c, rep); err != nil {
+			contextLogger.WithError(err).Error("hook(c, resp)")
+			return nil, err
+		}
+	}
+
 	return rep, nil
 }
 
 func (c *Cast) genReply(request *Request) (*Response, error) {
 	var (
-		rawResponse *http.Response
-		count       = 0
-		err         error
+		count = 0
+		err   error
+		resp  *Response
 	)
 
+outer:
 	for {
 
 		if count > c.retry {
-			break
+			break outer
 		}
 
+		var rawResponse *http.Response
 		rawResponse, err = c.client.Do(request.rawRequest)
 		count++
 
+		request.prof.requestDone = time.Now().In(time.UTC)
+		request.prof.requestCost = request.prof.requestDone.Sub(request.prof.requestStart)
+		request.prof.receivingDone = time.Now().In(time.UTC)
+		request.prof.receivingCost = request.prof.receivingDone.Sub(request.prof.receivingSart)
+
+		resp = new(Response)
+		resp.request = request
+		resp.rawResponse = rawResponse
+		if rawResponse != nil {
+			var repBody []byte
+			repBody, err = ioutil.ReadAll(rawResponse.Body)
+			if err != nil {
+				contextLogger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
+				return nil, err
+			}
+			rawResponse.Body.Close()
+			resp.body = repBody
+			resp.statusCode = rawResponse.StatusCode
+		}
+
 		var isRetry bool
 		for _, hook := range c.retryHooks {
-			if hook(rawResponse) {
+			if hook(resp, err) {
 				isRetry = true
 				break
 			}
 		}
 
-		if (isRetry && count <= c.retry+1) || err != nil {
-			if rawResponse != nil {
-				rawResponse.Body.Close()
-			}
-			if c.stg != nil {
-				<-time.After(c.stg.backoff(count))
-				continue
-			}
+		if isRetry && count < c.retry+1 && c.stg != nil {
+			<-time.After(c.stg.backoff(count))
+			continue outer
 		}
 
-		break
+		break outer
 	}
 
 	if err != nil {
 		contextLogger.WithError(err).Error("c.client.Do")
 		return nil, err
-	}
-	defer rawResponse.Body.Close()
-
-	repBody, err := ioutil.ReadAll(rawResponse.Body)
-	if err != nil {
-		contextLogger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
-		return nil, err
-	}
-
-	request.prof.requestDone = time.Now().In(time.UTC)
-	request.prof.requestCost = request.prof.requestDone.Sub(request.prof.requestStart)
-
-	request.prof.receivingDone = time.Now().In(time.UTC)
-	request.prof.receivingCost = request.prof.receivingDone.Sub(request.prof.receivingSart)
-
-	resp := new(Response)
-	resp.request = request
-	resp.rawResponse = rawResponse
-	resp.statusCode = rawResponse.StatusCode
-	resp.body = repBody
-
-	for _, hook := range c.responseHooks {
-		if err := hook(c, resp); err != nil {
-			contextLogger.WithError(err).Error("hook(c, resp)")
-			return nil, err
-		}
 	}
 
 	return resp, nil
