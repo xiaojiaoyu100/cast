@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -27,6 +30,7 @@ type Cast struct {
 	retryHooks         []RetryHook
 	dumpFlag           int
 	httpClientTimeout  time.Duration
+	logger             *logrus.Logger
 }
 
 // New returns an instance of Cast
@@ -39,6 +43,13 @@ func New(sl ...Setter) (*Cast, error) {
 	c.retryHooks = defaultRetryHooks
 	c.dumpFlag = fStd
 	c.httpClientTimeout = 10 * time.Second
+	c.logger = logrus.New()
+	c.logger.SetFormatter(&logrus.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+	c.logger.SetReportCaller(true)
+	c.logger.SetOutput(os.Stderr)
+	c.logger.SetLevel(logrus.InfoLevel)
 
 	for _, s := range sl {
 		if err := s(c); err != nil {
@@ -69,7 +80,7 @@ func (c *Cast) NewRequest() *Request {
 func (c *Cast) Do(request *Request) (*Response, error) {
 	body, err := request.reqBody()
 	if err != nil {
-		contextLogger.WithError(err).Error("request.reqBody")
+		c.logger.WithError(err).Error("request.reqBody")
 		return nil, err
 	}
 
@@ -81,7 +92,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 
 	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
 	if err != nil {
-		contextLogger.WithError(err).Error("http.NewRequest")
+		c.logger.WithError(err).Error("http.NewRequest")
 		return nil, err
 	}
 
@@ -98,7 +109,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 
 	for _, hook := range c.responseHooks {
 		if err := hook(c, rep); err != nil {
-			contextLogger.WithError(err).Error("hook(c, resp)")
+			c.logger.WithError(err).Error("hook(c, resp)")
 			return nil, err
 		}
 	}
@@ -136,7 +147,7 @@ outer:
 			var repBody []byte
 			repBody, err = ioutil.ReadAll(rawResponse.Body)
 			if err != nil {
-				contextLogger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
+				c.logger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
 				return nil, err
 			}
 			rawResponse.Body.Close()
@@ -161,7 +172,7 @@ outer:
 	}
 
 	if err != nil {
-		contextLogger.WithError(err).Error("c.client.Do")
+		c.logger.WithError(err).Error("c.client.Do")
 		return nil, err
 	}
 

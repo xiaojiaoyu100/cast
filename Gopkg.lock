@@ -29,7 +29,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "a1f597ede03a7bef967a422b5b3a5bd08805a01e"
+  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
 
 [[projects]]
   branch = "master"
@@ -38,7 +38,7 @@
     "unix",
     "windows"
   ]
-  revision = "6c81ef8f67ca3f42fc9cd71dfbd5f35b0c4b5771"
+  revision = "c432e742b0af385916e013f6a34e9e73d139cf82"
 
 [solve-meta]
   analyzer-name = "dep"

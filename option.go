@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Setter can change the cast instance
@@ -178,6 +180,23 @@ func WithHTTPClientTimeout(timeout time.Duration) Setter {
 func AddBeforeRequestHook(hks ...BeforeRequestHook) Setter {
 	return func(c *Cast) error {
 		c.beforeRequestHooks = append(c.beforeRequestHooks, hks...)
+		return nil
+	}
+}
+
+// WithLogHook sets a log callback when condition is achieved.
+func WithLogHook(f LogHook) Setter {
+	return func(c *Cast) error {
+		m := NewMonitor(f)
+		c.logger.AddHook(m)
+		return nil
+	}
+}
+
+// WithLogLevel sets log level.
+func WithLogLevel(l logrus.Level) Setter {
+	return func(c *Cast) error {
+		c.logger.SetLevel(l)
 		return nil
 	}
 }

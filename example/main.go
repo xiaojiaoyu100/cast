@@ -27,6 +27,7 @@ func main() {
 			time.Millisecond*200,
 			time.Millisecond*450,
 		),
+		//cast.WithLogLevel(logrus.WarnLevel),
 	)
 	if err != nil {
 		return

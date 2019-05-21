@@ -1,34 +1,16 @@
 package cast
 
 import (
-	"os"
-
 	"github.com/sirupsen/logrus"
 )
 
-var logger = logrus.New()
+// Logger return the underlying log instance.
+func (c *Cast) Logger() *logrus.Logger {
+	return c.logger
+}
 
 // LogHook log hook模板
 type LogHook func(entry *logrus.Entry)
-
-var contextLogger = logger.WithFields(logrus.Fields{
-	"source": "cast",
-})
-
-func init() {
-	logger.SetFormatter(&logrus.JSONFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	logger.SetReportCaller(true)
-	logger.SetOutput(os.Stderr)
-	logger.SetLevel(logrus.InfoLevel)
-}
-
-// AddLogHook add a log reporter.
-func AddLogHook(f LogHook) {
-	m := NewMonitor(f)
-	logger.AddHook(m)
-}
 
 // Monitor 信息监控
 type Monitor struct {

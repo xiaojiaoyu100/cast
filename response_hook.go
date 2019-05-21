@@ -62,7 +62,7 @@ func dump(cast *Cast, response *Response) error {
 	}
 
 	if buffer.Len() > 0 {
-		contextLogger.Info(buffer.String())
+		cast.Logger().Info(buffer.String())
 	}
 
 	return nil
