@@ -116,6 +116,12 @@ func (r *Request) Patch() *Request {
 	return r
 }
 
+// Method sets the following http request method.
+func (r *Request) Method(method string) *Request {
+	r.method = method
+	return r
+}
+
 // WithQueryParam sets query parameters.
 func (r *Request) WithQueryParam(queryParam interface{}) *Request {
 	r.queryParam = queryParam
