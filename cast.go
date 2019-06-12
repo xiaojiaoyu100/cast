@@ -2,10 +2,14 @@ package cast
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/cep21/circuit"
+	"github.com/cep21/circuit/closers/hystrix"
 
 	"github.com/sirupsen/logrus"
 )
@@ -31,6 +35,7 @@ type Cast struct {
 	dumpFlag           int
 	httpClientTimeout  time.Duration
 	logger             *logrus.Logger
+	h                  circuit.Manager
 }
 
 // New returns an instance of Cast
@@ -49,7 +54,26 @@ func New(sl ...Setter) (*Cast, error) {
 	})
 	c.logger.SetReportCaller(true)
 	c.logger.SetOutput(os.Stderr)
-	c.logger.SetLevel(logrus.InfoLevel)
+	c.logger.SetLevel(logrus.WarnLevel)
+
+	configuration := hystrix.Factory{
+		ConfigureOpener: hystrix.ConfigureOpener{
+			ErrorThresholdPercentage: 60,
+			RequestVolumeThreshold:   50,
+			RollingDuration:          10 * time.Second,
+			Now:                      time.Now,
+			NumBuckets:               10,
+		},
+		ConfigureCloser: hystrix.ConfigureCloser{
+			SleepWindow:                  time.Second * 10,
+			HalfOpenAttempts:             1,
+			RequiredConcurrentSuccessful: 1,
+		},
+	}
+
+	c.h = circuit.Manager{
+		DefaultCircuitProperties: []circuit.CommandPropertiesConstructor{configuration.Configure},
+	}
 
 	for _, s := range sl {
 		if err := s(c); err != nil {
@@ -64,8 +88,8 @@ func New(sl ...Setter) (*Cast, error) {
 	roundTripper := http.DefaultTransport
 	transport, ok := roundTripper.(*http.Transport)
 	if ok {
-		transport.MaxIdleConns = 100
-		transport.MaxIdleConnsPerHost = 100
+		transport.MaxIdleConns = 1000
+		transport.MaxIdleConnsPerHost = 1000
 	}
 
 	return c, nil
@@ -123,18 +147,40 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 		err   error
 		resp  *Response
 	)
-
 outer:
 	for {
-
 		if count > c.retry {
 			break outer
 		}
-
 		var rawResponse *http.Response
-		rawResponse, err = c.client.Do(request.rawRequest)
-		count++
 
+		circuits := c.h.AllCircuits()
+		var cb *circuit.Circuit
+		switch len(circuits) {
+		case 1:
+			cb = circuits[0]
+		default:
+			cb = c.h.GetCircuit(request.configName)
+		}
+		var fallback bool
+		if cb != nil {
+			err = cb.Execute(context.TODO(), func(i context.Context) error {
+				rawResponse, err = c.client.Do(request.rawRequest)
+				if err != nil {
+					return err
+				}
+				return nil
+			}, func(i context.Context, e error) error {
+				fallback = true
+				return e
+			})
+		} else {
+			rawResponse, err = c.client.Do(request.rawRequest)
+		}
+		if fallback {
+			break outer
+		}
+		count++
 		request.prof.requestDone = time.Now().In(time.UTC)
 		request.prof.requestCost = request.prof.requestDone.Sub(request.prof.requestStart)
 		request.prof.receivingDone = time.Now().In(time.UTC)

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cep21/circuit"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -198,5 +200,13 @@ func WithLogLevel(l logrus.Level) Setter {
 	return func(c *Cast) error {
 		c.logger.SetLevel(l)
 		return nil
+	}
+}
+
+// WithConfig loads a circuit.
+func WithConfig(name string, config ...circuit.Config) Setter {
+	return func(c *Cast) error {
+		_, err := c.h.CreateCircuit(name, config...)
+		return err
 	}
 }

@@ -41,6 +41,7 @@ type Request struct {
 	remoteAddress string
 	prof          profiling
 	rawRequest    *http.Request
+	configName    string
 }
 
 // NewRequest returns an instance of of Request.
@@ -219,11 +220,17 @@ func (r *Request) reqBody() ([]byte, error) {
 	return body, nil
 }
 
-// DoHeaderExist whether specified header exists
-func (r *Request) DoHeaderExist(h string) bool {
+// HeaderExist whether specified header exists.
+func (r *Request) HeaderExist(h string) bool {
 	if r == nil {
 		return false
 	}
 	_, ok := r.header[h]
 	return ok
+}
+
+// WithConfig is equipped with circuit.
+func (r *Request) WithConfig(name string) *Request {
+	r.configName = name
+	return r
 }
