@@ -203,10 +203,18 @@ func WithLogLevel(l logrus.Level) Setter {
 	}
 }
 
-// WithConfig loads a circuit.
-func WithConfig(name string, config ...circuit.Config) Setter {
+// AddConfig loads a circuit.
+func AddConfig(name string, config ...circuit.Config) Setter {
 	return func(c *Cast) error {
 		_, err := c.h.CreateCircuit(name, config...)
 		return err
+	}
+}
+
+// WithDefaultCircuit sets the default circuit breaker.
+func WithDefaultCircuit(name string) Setter {
+	return func(c *Cast) error {
+		c.defaultCircuitName = name
+		return nil
 	}
 }

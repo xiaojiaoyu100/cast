@@ -41,7 +41,7 @@ type Request struct {
 	remoteAddress string
 	prof          profiling
 	rawRequest    *http.Request
-	configName    string
+	circuitName   string
 }
 
 // NewRequest returns an instance of of Request.
@@ -229,8 +229,8 @@ func (r *Request) HeaderExist(h string) bool {
 	return ok
 }
 
-// WithConfig is equipped with circuit.
-func (r *Request) WithConfig(name string) *Request {
-	r.configName = name
+// WithCircuit is equipped with circuit.
+func (r *Request) WithCircuit(name string) *Request {
+	r.circuitName = name
 	return r
 }

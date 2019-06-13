@@ -36,6 +36,7 @@ type Cast struct {
 	httpClientTimeout  time.Duration
 	logger             *logrus.Logger
 	h                  circuit.Manager
+	defaultCircuitName string
 }
 
 // New returns an instance of Cast
@@ -152,15 +153,14 @@ outer:
 		if count > c.retry {
 			break outer
 		}
-		var rawResponse *http.Response
-
-		circuits := c.h.AllCircuits()
-		var cb *circuit.Circuit
-		switch len(circuits) {
-		case 1:
-			cb = circuits[0]
-		default:
-			cb = c.h.GetCircuit(request.configName)
+		var (
+			rawResponse *http.Response
+			cb          *circuit.Circuit
+		)
+		if len(request.circuitName) > 0 {
+			cb = c.h.GetCircuit(request.circuitName)
+		} else {
+			cb = c.h.GetCircuit(c.defaultCircuitName)
 		}
 		var fallback bool
 		if cb != nil {
@@ -176,9 +176,6 @@ outer:
 			})
 		} else {
 			rawResponse, err = c.client.Do(request.rawRequest)
-		}
-		if fallback {
-			break outer
 		}
 		count++
 		request.prof.requestDone = time.Now().In(time.UTC)
@@ -199,6 +196,10 @@ outer:
 			rawResponse.Body.Close()
 			resp.body = repBody
 			resp.statusCode = rawResponse.StatusCode
+		}
+
+		if fallback {
+			break outer
 		}
 
 		var isRetry bool
