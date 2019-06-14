@@ -59,14 +59,14 @@ func New(sl ...Setter) (*Cast, error) {
 
 	configuration := hystrix.Factory{
 		ConfigureOpener: hystrix.ConfigureOpener{
-			ErrorThresholdPercentage: 60,
-			RequestVolumeThreshold:   50,
+			ErrorThresholdPercentage: 70,
+			RequestVolumeThreshold:   10,
 			RollingDuration:          10 * time.Second,
 			Now:                      time.Now,
 			NumBuckets:               10,
 		},
 		ConfigureCloser: hystrix.ConfigureCloser{
-			SleepWindow:                  time.Second * 10,
+			SleepWindow:                  10 * time.Second,
 			HalfOpenAttempts:             1,
 			RequiredConcurrentSuccessful: 1,
 		},
@@ -167,11 +167,11 @@ outer:
 			err = cb.Execute(context.TODO(), func(i context.Context) error {
 				rawResponse, err = c.client.Do(request.rawRequest)
 				if err != nil {
+					fallback = true
 					return err
 				}
 				return nil
 			}, func(i context.Context, e error) error {
-				fallback = true
 				return e
 			})
 		} else {
@@ -198,7 +198,7 @@ outer:
 			resp.statusCode = rawResponse.StatusCode
 		}
 
-		if fallback {
+		if fallback && cb.IsOpen() {
 			break outer
 		}
 

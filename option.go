@@ -203,8 +203,8 @@ func WithLogLevel(l logrus.Level) Setter {
 	}
 }
 
-// AddConfig loads a circuit.
-func AddConfig(name string, config ...circuit.Config) Setter {
+// AddCircuitConfig loads a circuit config.
+func AddCircuitConfig(name string, config ...circuit.Config) Setter {
 	return func(c *Cast) error {
 		_, err := c.h.CreateCircuit(name, config...)
 		return err
