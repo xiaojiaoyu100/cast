@@ -206,6 +206,17 @@ func WithLogLevel(l logrus.Level) Setter {
 // AddCircuitConfig loads a circuit config.
 func AddCircuitConfig(name string, config ...circuit.Config) Setter {
 	return func(c *Cast) error {
+		if len(config) == 0 {
+			config = append(config, circuit.Config{
+				Execution: circuit.ExecutionConfig{
+					Timeout:               10 * time.Second,
+					MaxConcurrentRequests: 1000,
+				},
+				Fallback: circuit.FallbackConfig{
+					MaxConcurrentRequests: 1000,
+				},
+			})
+		}
 		_, err := c.h.CreateCircuit(name, config...)
 		return err
 	}

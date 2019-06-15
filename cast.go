@@ -55,7 +55,7 @@ func New(sl ...Setter) (*Cast, error) {
 	})
 	c.logger.SetReportCaller(true)
 	c.logger.SetOutput(os.Stderr)
-	c.logger.SetLevel(logrus.WarnLevel)
+	c.logger.SetLevel(logrus.InfoLevel)
 
 	configuration := hystrix.Factory{
 		ConfigureOpener: hystrix.ConfigureOpener{
