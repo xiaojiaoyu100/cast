@@ -170,6 +170,14 @@ func AddRetryHooks(hooks ...RetryHook) Setter {
 	}
 }
 
+// AddResponseHooks adds hooks that can be triggered when a request finished.
+func AddResponseHooks(hooks ...responseHook) Setter {
+	return func(c *Cast) error {
+		c.responseHooks = append(c.responseHooks, hooks...)
+		return nil
+	}
+}
+
 // WithHTTPClientTimeout sets the underlying http client timeout.
 func WithHTTPClientTimeout(timeout time.Duration) Setter {
 	return func(c *Cast) error {
