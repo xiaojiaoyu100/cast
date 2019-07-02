@@ -72,3 +72,31 @@ func (resp *Response) StatusOk() bool {
 func (resp *Response) Success() bool {
 	return resp.statusCode <= 299 && resp.statusCode >= 200
 }
+
+// Method returns the request method.
+func (resp *Response) Method() string {
+	if resp == nil {
+		return ""
+	}
+	if resp.request == nil {
+		return ""
+	}
+	if resp.request.rawRequest == nil {
+		return ""
+	}
+	return resp.request.rawRequest.Method
+}
+
+// URL returns the request url.
+func (resp *Response) URL() string {
+	if resp == nil {
+		return ""
+	}
+	if resp.request == nil {
+		return ""
+	}
+	if resp.request.rawRequest == nil {
+		return ""
+	}
+	return resp.request.rawRequest.URL.String()
+}
