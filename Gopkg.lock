@@ -2,6 +2,17 @@
 
 
 [[projects]]
+  name = "github.com/cep21/circuit"
+  packages = [
+    ".",
+    "closers/hystrix",
+    "faststats",
+    "internal/evar"
+  ]
+  revision = "9acd688e705c9ff330ef0ec354c801bade149b92"
+  version = "v2.4.2"
+
+[[projects]]
   name = "github.com/google/go-querystring"
   packages = ["query"]
   revision = "44c6ddd0a2342c386950e880b658017258da92fc"
@@ -43,6 +54,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b34918a83fa184318c88b126ec8a9dac9627ae40d25c7eb591b76d2ed6ae9666"
+  inputs-digest = "9a766502cf20b5b51982442bba838aa4729707bcdbab014f613b75a5a2f2f42a"
   solver-name = "gps-cdcl"
   solver-version = 1

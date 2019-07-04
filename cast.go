@@ -115,7 +115,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
+	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, ioutil.NopCloser(bytes.NewReader(body)))
 	if err != nil {
 		c.logger.WithError(err).Error("http.NewRequest")
 		return nil, err
@@ -162,6 +162,13 @@ outer:
 		} else {
 			cb = c.h.GetCircuit(c.defaultCircuitName)
 		}
+		if count >= 1 {
+			body, err := request.reqBody()
+			if err != nil {
+				return nil, err
+			}
+			request.rawRequest.Body = ioutil.NopCloser(bytes.NewReader(body))
+		}
 		var fallback bool
 		if cb != nil {
 			err = cb.Execute(context.TODO(), func(i context.Context) error {
@@ -193,7 +200,10 @@ outer:
 				c.logger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
 				return nil, err
 			}
-			rawResponse.Body.Close()
+			if err := rawResponse.Body.Close(); err != nil {
+				c.logger.WithError(err).Error("rawResponse.Body.Close()")
+				return nil, err
+			}
 			resp.body = repBody
 			resp.statusCode = rawResponse.StatusCode
 		}
