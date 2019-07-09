@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"bytes"
-
 	"github.com/google/go-querystring/query"
 )
 
@@ -28,6 +27,13 @@ func (body *requestJSONBody) ContentType() string {
 }
 
 func (body *requestJSONBody) Body() ([]byte, error) {
+	if body.payload == nil {
+		return []byte{}, nil
+	}
+	a, ok :=  body.payload.([]byte)
+	if ok {
+		return a, nil
+	}
 	return json.Marshal(body.payload)
 }
 

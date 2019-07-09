@@ -2,10 +2,10 @@ package cast
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
-	"testing"
-
 	"github.com/google/go-querystring/query"
+	"testing"
 )
 
 func TestReqJsonBody_ContentType(t *testing.T) {
@@ -14,7 +14,27 @@ func TestReqJsonBody_ContentType(t *testing.T) {
 }
 
 func TestReqJsonBody_Body(t *testing.T) {
+	type payload struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}
 
+	var p payload
+	p.Code = 0
+	p.Msg = "ok"
+
+	byte, err := json.Marshal(&p)
+
+	req := requestJSONBody{
+		payload: byte,
+	}
+
+	body, err := req.Body()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(string(body))
 }
 
 func TestReqFormUrlEncodedBody_ContentType(t *testing.T) {
