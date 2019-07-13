@@ -39,11 +39,17 @@ func (resp *Response) String() string {
 
 // DecodeFromJSON decodes the JSON body into data variable.
 func (resp *Response) DecodeFromJSON(v interface{}) error {
+	if len(resp.body) == 0 {
+		return nil
+	}
 	return json.Unmarshal(resp.body, &v)
 }
 
 // DecodeFromXML decodes the XML body into  data variable.
 func (resp *Response) DecodeFromXML(v interface{}) error {
+	if len(resp.body) == 0 {
+		return nil
+	}
 	return xml.Unmarshal(resp.body, &v)
 }
 
