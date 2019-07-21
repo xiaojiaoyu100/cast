@@ -3,6 +3,7 @@ package cast
 import (
 	"io"
 	"net"
+	"net/url"
 )
 
 // Error defines cast error
@@ -18,14 +19,15 @@ func isNetworkErr(err error) bool {
 }
 
 func isEOF(err error) bool {
-	return err == io.EOF
+	urlErr, ok := err.(*url.Error)
+	return ok && urlErr.Err == io.EOF
 }
 
 func shouldRetry(err error) bool {
-	if isEOF(err) {
+	switch  {
+	case isNetworkErr(err):
 		return true
-	}
-	if isNetworkErr(err) {
+	case isEOF(err):
 		return true
 	}
 	return false
