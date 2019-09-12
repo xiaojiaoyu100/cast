@@ -74,7 +74,7 @@ func TestSetHeader(t *testing.T) {
 		t.Fatal("fail to call New()")
 	}
 	err = SetHeader("Content-Type", "text/plain", "application/json")(c)
-	if err != nil {
+	if err == nil {
 		t.Fatal("SetHeader error")
 	}
 	if len(c.header["Content-Type"]) != 0 {
@@ -100,7 +100,7 @@ func TestAddHeader(t *testing.T) {
 		t.Fatal("fail to call New()")
 	}
 	err = AddHeader("Content-Type", "text/plain", "application/json")(c)
-	if err != nil {
+	if err == nil {
 		t.Fatal("AddHeader error")
 	}
 	if len(c.header["Content-Type"]) != 0 {
