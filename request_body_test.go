@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"github.com/google/go-querystring/query"
 	"testing"
+
+	"github.com/google/go-querystring/query"
 )
 
 func TestReqJsonBody_ContentType(t *testing.T) {
@@ -24,6 +25,9 @@ func TestReqJsonBody_Body(t *testing.T) {
 	p.Msg = "ok"
 
 	byte, err := json.Marshal(&p)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	req := requestJSONBody{
 		payload: byte,

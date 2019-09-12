@@ -209,9 +209,10 @@ func (r *Request) AddHeader(vv ...string) {
 	}
 }
 
-func (r *Request) reqBody() ([]byte, error) {
+// ReqBody returns the underlying body.
+func (r *Request) ReqBody() ([]byte, error) {
 	if r.body == nil {
-		return nil, nil
+		return []byte{}, nil
 	}
 	body, err := r.body.Body()
 	if err != nil {
@@ -233,4 +234,9 @@ func (r *Request) HeaderExist(h string) bool {
 func (r *Request) WithCircuit(name string) *Request {
 	r.circuitName = name
 	return r
+}
+
+// RawRequest returns the http request.
+func (r *Request) RawRequest() *http.Request {
+	return r.rawRequest
 }

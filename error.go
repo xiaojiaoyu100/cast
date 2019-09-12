@@ -24,7 +24,7 @@ func isEOF(err error) bool {
 }
 
 func shouldRetry(err error) bool {
-	switch  {
+	switch {
 	case isNetworkErr(err):
 		return true
 	case isEOF(err):

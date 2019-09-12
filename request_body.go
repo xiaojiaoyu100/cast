@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"bytes"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -30,7 +31,7 @@ func (body *requestJSONBody) Body() ([]byte, error) {
 	if body.payload == nil {
 		return []byte{}, nil
 	}
-	a, ok :=  body.payload.([]byte)
+	a, ok := body.payload.([]byte)
 	if ok {
 		return a, nil
 	}
@@ -107,7 +108,7 @@ func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
 				return nil, err
 			}
 		default:
-			if len(data.FileName) == 0 || len(data.FileName) == 0 {
+			if len(data.FieldName) == 0 || len(data.FileName) == 0 {
 				continue
 			}
 

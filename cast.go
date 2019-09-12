@@ -103,7 +103,7 @@ func (c *Cast) NewRequest() *Request {
 
 // Do initiates a request.
 func (c *Cast) Do(request *Request) (*Response, error) {
-	body, err := request.reqBody()
+	body, err := request.ReqBody()
 	if err != nil {
 		c.logger.WithError(err).Error("request.reqBody")
 		return nil, err
@@ -163,7 +163,7 @@ outer:
 			cb = c.h.GetCircuit(c.defaultCircuitName)
 		}
 		if count >= 1 {
-			body, err := request.reqBody()
+			body, err := request.ReqBody()
 			if err != nil {
 				return nil, err
 			}
