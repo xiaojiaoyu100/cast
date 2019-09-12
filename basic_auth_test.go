@@ -1,8 +1,8 @@
 package cast
 
 import (
-	"crypto/rand"
 	"encoding/base64"
+	"math/rand"
 	"testing"
 )
 

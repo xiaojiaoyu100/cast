@@ -19,7 +19,7 @@ func (resp *Response) StatusCode() int {
 	return resp.statusCode
 }
 
-//Cookies returns http cookies.
+// Cookies returns http cookies.
 func (resp *Response) Cookies() []*http.Cookie {
 	if resp.rawResponse == nil {
 		return []*http.Cookie{}

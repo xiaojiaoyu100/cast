@@ -6,6 +6,6 @@ type BasicAuth struct {
 	password string
 }
 
-func (ba *BasicAuth) info() (string, string) {
+func (ba *BasicAuth) info() (user, pass string) {
 	return ba.username, ba.password
 }

@@ -110,12 +110,12 @@ func WithConstantBackoffStrategy(internal time.Duration) Setter {
 }
 
 // WithExponentialBackoffStrategy changes the retry strategy called "Exponential".
-func WithExponentialBackoffStrategy(base, cap time.Duration) Setter {
+func WithExponentialBackoffStrategy(base, capacity time.Duration) Setter {
 	return func(c *Cast) error {
 		c.stg = exponentialBackoffStrategy{
 			exponentialBackoff{
 				base: base,
-				cap:  cap,
+				cap:  capacity,
 			},
 		}
 		return nil
@@ -123,12 +123,12 @@ func WithExponentialBackoffStrategy(base, cap time.Duration) Setter {
 }
 
 // WithExponentialBackoffEqualJitterStrategy changes the retry strategy called "Equal Jitter".
-func WithExponentialBackoffEqualJitterStrategy(base, cap time.Duration) Setter {
+func WithExponentialBackoffEqualJitterStrategy(base, capacity time.Duration) Setter {
 	return func(c *Cast) error {
 		c.stg = exponentialBackoffEqualJitterStrategy{
 			exponentialBackoff{
 				base: base,
-				cap:  cap,
+				cap:  capacity,
 			},
 		}
 		return nil
@@ -136,12 +136,12 @@ func WithExponentialBackoffEqualJitterStrategy(base, cap time.Duration) Setter {
 }
 
 // WithExponentialBackoffFullJitterStrategy changes the retry strategy called "Full Jitter".
-func WithExponentialBackoffFullJitterStrategy(base, cap time.Duration) Setter {
+func WithExponentialBackoffFullJitterStrategy(base, capacity time.Duration) Setter {
 	return func(c *Cast) error {
 		c.stg = exponentialBackoffFullJitterStrategy{
 			exponentialBackoff{
 				base: base,
-				cap:  cap,
+				cap:  capacity,
 			},
 		}
 		return nil
@@ -149,12 +149,12 @@ func WithExponentialBackoffFullJitterStrategy(base, cap time.Duration) Setter {
 }
 
 // WithExponentialBackoffDecorrelatedJitterStrategy changes the retry strategy called “Decorrelated Jitter”.
-func WithExponentialBackoffDecorrelatedJitterStrategy(base, cap time.Duration) Setter {
+func WithExponentialBackoffDecorrelatedJitterStrategy(base, capacity time.Duration) Setter {
 	return func(c *Cast) error {
 		c.stg = exponentialBackoffDecorrelatedJitterStrategy{
 			exponentialBackoff{
 				base: base,
-				cap:  cap,
+				cap:  capacity,
 			},
 			base,
 		}

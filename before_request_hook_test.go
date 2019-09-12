@@ -86,7 +86,9 @@ func Test_setRequestHeader(t *testing.T) {
 	for i, tt := range tests {
 		err := setRequestHeader(c, tt.request)
 		ok(t, err)
-		assert(t, tt.request.header.Get("Content-Type") == tt.want, "%d: unexpected setRequestHeader, got: %s ", i, tt.request.header.Get("Content-Type"))
+		assert(t, tt.request.header.Get("Content-Type") == tt.want,
+			"%d: unexpected setRequestHeader, got: %s ",
+			i, tt.request.header.Get("Content-Type"))
 	}
 
 }

@@ -22,15 +22,15 @@ func TestReqJsonBody_Body(t *testing.T) {
 
 	var p payload
 	p.Code = 0
-	p.Msg = "ok"
+	p.Msg = "3323"
 
-	byte, err := json.Marshal(&p)
+	b, err := json.Marshal(&p)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	req := requestJSONBody{
-		payload: byte,
+		payload: b,
 	}
 
 	body, err := req.Body()
@@ -105,7 +105,7 @@ func TestReqXmlBody_Body(t *testing.T) {
 	err = xml.NewEncoder(&buffer).Encode(v)
 	ok(t, err)
 
-	t.Log(string(buffer.String()))
+	t.Log(buffer.String())
 
 	assert(t, string(body) == buffer.String(), "unexpected Body()")
 

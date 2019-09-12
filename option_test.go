@@ -35,7 +35,7 @@ func TestWithBasicAuth(t *testing.T) {
 }
 
 func TestWithBearerToken(t *testing.T) {
-	token := "djsfdeferfrefjnrjfn"
+	token := "sdsjdsj"
 	cast, err := New(WithBearerToken(token))
 	if err != nil {
 		t.Fatal("fail to call New()")

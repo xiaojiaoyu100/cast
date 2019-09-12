@@ -110,7 +110,8 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 	}
 
 	for _, hook := range c.beforeRequestHooks {
-		if err := hook(c, request); err != nil {
+		err = hook(c, request)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -122,7 +123,8 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 	}
 
 	for _, hook := range c.requestHooks {
-		if err = hook(c, request); err != nil {
+		err = hook(c, request)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -148,10 +150,10 @@ func (c *Cast) genReply(request *Request) (*Response, error) {
 		err   error
 		resp  *Response
 	)
-outer:
+
 	for {
 		if count > c.retry {
-			break outer
+			break
 		}
 		var (
 			rawResponse *http.Response
@@ -163,7 +165,8 @@ outer:
 			cb = c.h.GetCircuit(c.defaultCircuitName)
 		}
 		if count >= 1 {
-			body, err := request.ReqBody()
+			var body []byte
+			body, err = request.ReqBody()
 			if err != nil {
 				return nil, err
 			}
@@ -200,7 +203,8 @@ outer:
 				c.logger.WithError(err).Error("ioutil.ReadAll(rawResponse.Body)")
 				return nil, err
 			}
-			if err := rawResponse.Body.Close(); err != nil {
+			err = rawResponse.Body.Close()
+			if err != nil {
 				c.logger.WithError(err).Error("rawResponse.Body.Close()")
 				return nil, err
 			}
@@ -209,7 +213,7 @@ outer:
 		}
 
 		if fallback && cb.IsOpen() {
-			break outer
+			break
 		}
 
 		var isRetry bool
@@ -220,12 +224,12 @@ outer:
 			}
 		}
 
-		if isRetry && count < c.retry+1 && c.stg != nil {
+		if isRetry && count <= c.retry && c.stg != nil {
 			<-time.After(c.stg.backoff(count))
-			continue outer
+			continue
 		}
 
-		break outer
+		break
 	}
 
 	if err != nil {

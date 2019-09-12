@@ -103,16 +103,16 @@ func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
 
 	for _, data := range body.formData {
 		switch {
-		case len(data.Value) != 0:
+		case data.Value == "":
 			if err := w.WriteField(data.FieldName, data.Value); err != nil {
 				return nil, err
 			}
 		default:
-			if len(data.FieldName) == 0 || len(data.FileName) == 0 {
+			if data.FieldName == "" || data.FileName == "" {
 				continue
 			}
 
-			if len(data.Path) == 0 && data.Reader == nil {
+			if data.Path == "" && data.Reader == nil {
 				continue
 			}
 

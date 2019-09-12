@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	str = `ivqEBnJ8/+3L7Cr1TN6t7yxhelXREMCB6LmXif1BaLzSOhUcLPDYqapdlKTd1D/KH9D8pmnRZ9OGuSJ7kFkksZxLNQjuqtjvKICpJI5I2R8nmZ1VdEAGpp2xbIE1m+alSKt9zg==`
+	str = `ivqEBnJ8/+3L7Cr1TN6t7yxhelXREMCB6LmXif1BaLzSOhUcLPDYqapdlKTd1D
+/KH9D8pmnRZ9OGuSJ7kFkksZxLNQjuqtjvKICpJI5I2R8nmZ1VdEAGpp2xbIE1m+alSKt9zg==`
 )
 
 func BenchmarkBufferNormal(b *testing.B) {
