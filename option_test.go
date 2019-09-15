@@ -95,6 +95,11 @@ func TestSetHeader(t *testing.T) {
 }
 
 func TestAddHeader(t *testing.T) {
+	const (
+		textPlain       = "text/plain"
+		applicationJSON = "application/json"
+	)
+
 	c, err := New()
 	if err != nil {
 		t.Fatal("fail to call New()")
@@ -107,7 +112,7 @@ func TestAddHeader(t *testing.T) {
 		t.Fatal("AddHeader error")
 	}
 
-	err = AddHeader("Content-Type", "text/plain", "Content-Type", "application/json")(c)
+	err = AddHeader("Content-Type", textPlain, "Content-Type", applicationJSON)(c)
 	if err != nil {
 		t.Fatal("AddHeader error")
 	}
@@ -115,7 +120,12 @@ func TestAddHeader(t *testing.T) {
 		t.Fatal("AddHeader error")
 	}
 
-	if c.header.Get("Content-Type") != "text/plain" {
+	vv := c.header["Content-Type"]
+	if vv[0] != textPlain {
+		t.Fatal("AddHeader error")
+	}
+
+	if vv[1] != applicationJSON {
 		t.Fatal("AddHeader error")
 	}
 }
