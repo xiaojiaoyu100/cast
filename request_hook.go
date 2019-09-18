@@ -12,9 +12,9 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-type requestHook func(cast *Cast, request *Request) error
+type RequestHook func(cast *Cast, request *Request) error
 
-var defaultRequestHooks = []requestHook{
+var defaultRequestHooks = []RequestHook{
 	finalizeQueryParamIfAny,
 	finalizeAuthorization,
 	addCookies,

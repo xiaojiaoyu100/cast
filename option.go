@@ -186,7 +186,7 @@ func WithHTTPClientTimeout(timeout time.Duration) Setter {
 	}
 }
 
-// AddBeforeRequestHook 添加请求hook
+// AddBeforeRequestHook adds a before request hook.
 func AddBeforeRequestHook(hks ...BeforeRequestHook) Setter {
 	return func(c *Cast) error {
 		c.beforeRequestHooks = append(c.beforeRequestHooks, hks...)
@@ -234,6 +234,14 @@ func AddCircuitConfig(name string, config ...circuit.Config) Setter {
 func WithDefaultCircuit(name string) Setter {
 	return func(c *Cast) error {
 		c.defaultCircuitName = name
+		return nil
+	}
+}
+
+// AddRequestHook adds a request hook.
+func AddRequestHook(hks ...RequestHook) Setter {
+	return func(c *Cast) error {
+		c.requestHooks = append(c.requestHooks, hks...)
 		return nil
 	}
 }

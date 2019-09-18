@@ -30,7 +30,7 @@ type Cast struct {
 	retry              int
 	stg                backoffStrategy
 	beforeRequestHooks []BeforeRequestHook
-	requestHooks       []requestHook
+	requestHooks       []RequestHook
 	responseHooks      []responseHook
 	retryHooks         []RetryHook
 	dumpFlag           int
