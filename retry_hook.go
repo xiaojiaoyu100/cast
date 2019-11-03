@@ -8,5 +8,5 @@ var defaultRetryHooks = []RetryHook{
 }
 
 func retry(_ *Response, err error) bool {
-	return shouldRetry(err)
+	return ShouldRetry(err)
 }

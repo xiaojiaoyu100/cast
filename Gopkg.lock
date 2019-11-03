@@ -4,13 +4,13 @@
 [[projects]]
   name = "github.com/cep21/circuit"
   packages = [
-    ".",
-    "closers/hystrix",
-    "faststats",
-    "internal/evar"
+    "v3",
+    "v3/closers/hystrix",
+    "v3/faststats",
+    "v3/internal/evar"
   ]
-  revision = "9acd688e705c9ff330ef0ec354c801bade149b92"
-  version = "v2.4.2"
+  revision = "768780274348ba1e986a23a5feef9c829ab37426"
+  version = "v3.1.0"
 
 [[projects]]
   name = "github.com/google/go-querystring"
@@ -33,27 +33,18 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
-  version = "v1.3.0"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
-  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
-  revision = "c432e742b0af385916e013f6a34e9e73d139cf82"
+  packages = ["unix"]
+  revision = "f43be2a4598cf3a47be9f94f0c28197ed9eae611"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9a766502cf20b5b51982442bba838aa4729707bcdbab014f613b75a5a2f2f42a"
+  inputs-digest = "d077902c07931b4b94fa67c0fac396c9f5cac38dcab9b3ecdc6dbf33f431fd59"
   solver-name = "gps-cdcl"
   solver-version = 1

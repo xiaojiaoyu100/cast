@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cep21/circuit"
-	"github.com/cep21/circuit/closers/hystrix"
+	"github.com/cep21/circuit/v3"
+	"github.com/cep21/circuit/v3/closers/hystrix"
 
 	"github.com/sirupsen/logrus"
 )

@@ -23,7 +23,8 @@ func isEOF(err error) bool {
 	return ok && urlErr.Err == io.EOF
 }
 
-func shouldRetry(err error) bool {
+// ShouldRetry returns whether an error needs to be retried.
+func ShouldRetry(err error) bool {
 	switch {
 	case isNetworkErr(err):
 		return true

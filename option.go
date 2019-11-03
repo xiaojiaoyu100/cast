@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cep21/circuit"
+	"github.com/cep21/circuit/v3"
 
 	"github.com/sirupsen/logrus"
 )

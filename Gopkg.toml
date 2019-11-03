@@ -38,7 +38,7 @@
 
 [[constraint]]
   name = "github.com/cep21/circuit"
-  version = "v2.4.2"
+  version = "3.1.0"
 
 [prune]
   unused-packages = true
