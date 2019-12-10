@@ -123,7 +123,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, ioutil.NopCloser(bytes.NewReader(body)))
+	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
 	if err != nil {
 		c.logger.WithError(err).Error("http.NewRequest")
 		return nil, err

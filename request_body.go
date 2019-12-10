@@ -24,7 +24,7 @@ type requestJSONBody struct {
 }
 
 func (body *requestJSONBody) ContentType() string {
-	return applicaionJSON
+	return applicationJSON
 }
 
 func (body *requestJSONBody) Body() ([]byte, error) {

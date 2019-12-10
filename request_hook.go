@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// RequestHook 请求回调
 type RequestHook func(cast *Cast, request *Request) error
 
 var defaultRequestHooks = []RequestHook{
