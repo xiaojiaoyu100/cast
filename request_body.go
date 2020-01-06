@@ -47,6 +47,13 @@ func (body *requestFormURLEncodedBody) ContentType() string {
 }
 
 func (body *requestFormURLEncodedBody) Body() ([]byte, error) {
+	if body.payload == nil {
+		return []byte{}, nil
+	}
+	a, ok := body.payload.([]byte)
+	if ok {
+		return a, nil
+	}
 	values, err := query.Values(body.payload)
 	if err != nil {
 		return nil, err
@@ -59,6 +66,13 @@ type requestXMLBody struct {
 }
 
 func (body *requestXMLBody) Body() ([]byte, error) {
+	if body.payload == nil {
+		return []byte{}, nil
+	}
+	a, ok := body.payload.([]byte)
+	if ok {
+		return a, nil
+	}
 	return xml.Marshal(body.payload)
 }
 
