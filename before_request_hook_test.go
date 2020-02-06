@@ -64,7 +64,7 @@ func Test_setRequestHeader(t *testing.T) {
 	}{
 		Age: 13,
 	}
-
+	data, _ := xml.Marshal(xmlBody)
 	tests := [...]struct {
 		request *Request
 		want    string
@@ -80,6 +80,11 @@ func Test_setRequestHeader(t *testing.T) {
 		2: {
 			request: c.NewRequest().WithXMLBody(xmlBody).Post(),
 			want:    "application/xml; charset=utf-8",
+		},
+		3: {
+			request: c.NewRequest().WithCustomBody("application/xml; charset=utf-8",
+				data).Post(),
+			want: "application/xml; charset=utf-8",
 		},
 	}
 

@@ -19,6 +19,19 @@ type requestBody interface {
 	Body() ([]byte, error)
 }
 
+type requestCustomBody struct {
+	payload     []byte
+	contentType string
+}
+
+func (body *requestCustomBody) ContentType() string {
+	return body.contentType
+}
+
+func (body *requestCustomBody) Body() ([]byte, error) {
+	return body.payload, nil
+}
+
 type requestJSONBody struct {
 	payload interface{}
 }

@@ -174,6 +174,13 @@ func (r *Request) WithMultipartFormDataBody(formData ...*FormData) *Request {
 	}
 	return r
 }
+func (r *Request) WithCustomBody(contentType string, body []byte) *Request {
+	r.body = &requestCustomBody{
+		payload:     body,
+		contentType: contentType,
+	}
+	return r
+}
 
 // WithTimeout sets the request timeout.
 func (r *Request) WithTimeout(timeout time.Duration) *Request {
