@@ -115,7 +115,15 @@ func (resp *Response) SetHeader(vv ...string) *Response {
 	if resp.request == nil {
 		return nil
 	}
-	resp.request.SetHeader(vv...)
+	if resp.request.rawRequest == nil {
+		return nil
+	}
+	if len(vv)%2 != 0 {
+		return nil
+	}
+	for i := 0; i < len(vv); i += 2 {
+		resp.request.rawRequest.Header.Set(vv[i], vv[i+1])
+	}
 	return resp
 }
 
@@ -127,6 +135,14 @@ func (resp *Response) AddHeader(vv ...string) *Response {
 	if resp.request == nil {
 		return nil
 	}
-	resp.request.AddHeader(vv...)
+	if resp.request.rawRequest == nil {
+		return nil
+	}
+	if len(vv)%2 != 0 {
+		return nil
+	}
+	for i := 0; i < len(vv); i += 2 {
+		resp.request.rawRequest.Header.Add(vv[i], vv[i+1])
+	}
 	return resp
 }
