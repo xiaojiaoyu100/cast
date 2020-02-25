@@ -167,13 +167,15 @@ func (r *Request) WithFormURLEncodedBody(body interface{}) *Request {
 	return r
 }
 
-// WithMultipartFormDataBody create body with form data
+// WithMultipartFormDataBody creates body with form data
 func (r *Request) WithMultipartFormDataBody(formData ...*FormData) *Request {
 	r.body = &requestMultipartFormDataBody{
 		formData: formData,
 	}
 	return r
 }
+
+// WithCustomBody creates custom body.
 func (r *Request) WithCustomBody(contentType string, body []byte) *Request {
 	r.body = &requestCustomBody{
 		payload:     body,

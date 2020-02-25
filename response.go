@@ -106,3 +106,27 @@ func (resp *Response) URL() string {
 	}
 	return resp.request.rawRequest.URL.String()
 }
+
+// SetHeader sets the key, value pair list.
+func (resp *Response) SetHeader(vv ...string) *Response {
+	if resp == nil {
+		return nil
+	}
+	if resp.request == nil {
+		return nil
+	}
+	resp.request.SetHeader(vv...)
+	return resp
+}
+
+// AddHeader adds the key, value pair list.
+func (resp *Response) AddHeader(vv ...string) *Response {
+	if resp == nil {
+		return nil
+	}
+	if resp.request == nil {
+		return nil
+	}
+	resp.request.AddHeader(vv...)
+	return resp
+}
