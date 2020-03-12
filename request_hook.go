@@ -82,13 +82,11 @@ func setTimeoutIfAny(_ *Cast, request *Request) error {
 	if request.timeout == 0 {
 		return nil
 	}
-
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancel(request.rawRequest.Context())
 	_ = time.AfterFunc(request.timeout, func() {
 		cancel()
 	})
 	request.rawRequest = request.rawRequest.WithContext(ctx)
-
 	return nil
 }
 

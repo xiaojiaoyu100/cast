@@ -109,7 +109,7 @@ func (c *Cast) NewRequest() *Request {
 }
 
 // Do initiates a request.
-func (c *Cast) Do(request *Request) (*Response, error) {
+func (c *Cast) Do(ctx context.Context, request *Request) (*Response, error) {
 	body, err := request.ReqBody()
 	if err != nil {
 		c.logger.WithError(err).Error("request.reqBody")
@@ -123,7 +123,7 @@ func (c *Cast) Do(request *Request) (*Response, error) {
 		}
 	}
 
-	request.rawRequest, err = http.NewRequest(request.method, c.baseURL+request.path, bytes.NewReader(body))
+	request.rawRequest, err = http.NewRequestWithContext(ctx, request.method, c.baseURL+request.path, bytes.NewReader(body))
 	if err != nil {
 		c.logger.WithError(err).Error("http.NewRequest")
 		return nil, err
