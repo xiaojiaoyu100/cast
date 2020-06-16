@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"strings"
 	"testing"
 
 	"github.com/google/go-querystring/query"
@@ -130,4 +131,20 @@ func TestReqPlainBody_Body(t *testing.T) {
 func TestReqPlainBody_ContentType(t *testing.T) {
 	plainBody := requestPlainBody{}
 	assert(t, plainBody.ContentType() == "text/plain; charset=utf-8", "unexpected xml ContentType()")
+}
+
+func TestReqMultipartFormDataBody(t *testing.T) {
+	field1 := FormData{FieldName: "text", Value: "input"}
+	field2 := FormData{FieldName: "media", FileName: "test.txt", Reader: strings.NewReader("txt body")}
+	multipartBody := requestMultipartFormDataBody{
+		formData: []*FormData{&field1, &field2},
+	}
+
+	body, err := multipartBody.Body()
+	ok(t, err)
+
+	t.Log(string(body))
+	t.Log(multipartBody.ContentType())
+
+	assert(t, strings.HasPrefix(multipartBody.ContentType(), "multipart/form-data; boundary="), "unexpected multipart ContentType()")
 }

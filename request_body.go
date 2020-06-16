@@ -130,7 +130,7 @@ func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
 
 	for _, data := range body.formData {
 		switch {
-		case data.Value == "":
+		case data.Value != "":
 			if err := w.WriteField(data.FieldName, data.Value); err != nil {
 				return nil, err
 			}
