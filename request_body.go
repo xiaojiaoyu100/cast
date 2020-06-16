@@ -126,7 +126,6 @@ func (body *requestMultipartFormDataBody) ContentType() string {
 func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	w := multipart.NewWriter(buffer)
-	defer w.Close()
 
 	for _, data := range body.formData {
 		switch {
@@ -171,6 +170,10 @@ func (body *requestMultipartFormDataBody) Body() ([]byte, error) {
 				}
 			}
 		}
+	}
+	err := w.Close()
+	if err != nil {
+		return nil, err
 	}
 	body.contentType = w.FormDataContentType()
 	return buffer.Bytes(), nil
