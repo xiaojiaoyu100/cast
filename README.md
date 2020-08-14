@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/xiaojiaoyu100/cast.svg?branch=master)](https://travis-ci.org/xiaojiaoyu100/cast)
 [![Go Report Card](https://goreportcard.com/badge/github.com/xiaojiaoyu100/cast)](https://goreportcard.com/report/github.com/xiaojiaoyu100/cast)
+[![GoDoc](https://godoc.org/github.com/xiaojiaoyu100/cast?status.svg)](https://godoc.org/github.com/xiaojiaoyu100/cast)
 
 Cast is a http request library written in Golang.
 
