@@ -11,6 +11,7 @@ import (
 
 	"github.com/cep21/circuit/v3"
 	"github.com/cep21/circuit/v3/closers/hystrix"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/sirupsen/logrus"
 )
@@ -119,6 +120,16 @@ func (c *Cast) Do(ctx context.Context, request *Request) (*Response, error) {
 	for _, hook := range c.beforeRequestHooks {
 		err = hook(c, request)
 		if err != nil {
+			return nil, err
+		}
+	}
+
+	tracer := opentracing.GlobalTracer()
+	span := opentracing.SpanFromContext(ctx)
+	if tracer != nil && span != nil {
+		err := tracer.Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(request.header))
+		if err != nil {
+			c.logger.WithError(err).Error("tracer.Inject")
 			return nil, err
 		}
 	}
