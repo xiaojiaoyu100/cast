@@ -3,15 +3,15 @@ package cast
 import (
 	"bytes"
 	"context"
+	"errors"
+	"github.com/cep21/circuit/v3"
+	"github.com/cep21/circuit/v3/closers/hystrix"
+	"github.com/opentracing/opentracing-go"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/cep21/circuit/v3"
-	"github.com/cep21/circuit/v3/closers/hystrix"
-	"github.com/opentracing/opentracing-go"
 
 	"github.com/sirupsen/logrus"
 )
@@ -102,6 +102,16 @@ func New(sl ...Setter) (*Cast, error) {
 	}
 
 	return c, nil
+}
+
+// SetInsecureSkipVerify set the InsecureSkipVerify value.
+func (c *Cast) SetInsecureSkipVerify(v bool) error {
+	t, ok := c.client.Transport.(*http.Transport)
+	if !ok {
+		return errors.New("http client type assertion failed")
+	}
+	t.TLSClientConfig.InsecureSkipVerify = true
+	return nil
 }
 
 // NewRequest returns an instance of Request.
