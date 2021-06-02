@@ -3,6 +3,7 @@ package cast
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"github.com/cep21/circuit/v3"
 	"github.com/cep21/circuit/v3/closers/hystrix"
@@ -109,6 +110,9 @@ func (c *Cast) SetInsecureSkipVerify(v bool) error {
 	t, ok := c.client.Transport.(*http.Transport)
 	if !ok {
 		return errors.New("http client type assertion failed")
+	}
+	if t.TLSClientConfig == nil {
+		t.TLSClientConfig = &tls.Config{}
 	}
 	t.TLSClientConfig.InsecureSkipVerify = true
 	return nil
